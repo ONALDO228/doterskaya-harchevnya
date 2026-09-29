@@ -17,15 +17,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Карбонара Рапира — Дотерский харч</title>
+  <title>Карбонара Рапира — Дотерская харчевня</title>
   <link rel="stylesheet" href="style.css">
+  <!-- правила сайта и плашка про хранилище: см. notice.js -->
+  <link rel="stylesheet" href="notice.css">
 </head>
 
-<body>
+<body data-recipe-id="carbonara" data-recipe-title="Карбонара Рапира">
+  <!-- data-recipe-id — ключ, по которому reviews.js понимает, чей это
+       рецепт. У всех четырёх страниц значения разные, файл скрипта один. -->
 
   <div class="page-nav">
     <a class="back-link" href="index.html">← На главную</a>
   </div>
+
+  <div id="account-bar"></div>
 
   <main class="recipe">
 
@@ -34,12 +40,15 @@
       <p class="recipe-meta">⏱ 20 мин &nbsp;•&nbsp; 👥 2 порции &nbsp;•&nbsp; 🥘 средне</p>
     </header>
 
-    <!-- ФОТО. Своей картинки у карбонары ещё нет, поэтому тут
-         просто эмодзи на градиенте — класс photo-orange даёт
-         оранжевый фон, а .recipe-photo центрирует эмодзи и делает
-         его 120px. Когда появится фото — заменишь эту строку на
-         <img class="recipe-img fill" src="img/carbonara.jpg" alt="..."> -->
-    <div class="recipe-photo photo-orange">🍝</div>
+    <!-- ФОТО. Эмодзи 🍝 лежит ПОД картинкой: пока файла
+         img/carbonara.jpg нет, виден он на оранжевом градиенте.
+         Как только файл появится в папке img/, картинка накроет
+         эмодзи сама — править после этого ничего не нужно. -->
+    <div class="recipe-photo photo-orange">🍝
+      <img class="recipe-img fill"
+           src="img/carbonara.jpg"
+           alt="Карбонара Рапира — спагетти с гуанчале, сыром и перцем">
+    </div>
 
     <div class="recipe-grid">
 
@@ -80,9 +89,25 @@
     </div>
   </main>
 
+  <!-- Отзывы и рейтинг (рисует reviews.js) -->
+  <div class="page">
+    <section id="reviews"></section>
+  </div>
+
   <footer class="footer">
-    <p>© 2026 Дотерский харч</p>
+    <p>© 2026 Дотерская харчевня</p>
   </footer>
+
+  <script src="store.js" defer></script>
+  <script src="ui.js" defer></script>
+  <script src="auth.js" defer></script>
+  <script src="reviews.js" defer></script>
+
+  <!-- окно регламента и плашка про хранилище. Стоит последним:
+      на страницах корня Store к этому моменту уже подключён,
+      а в разделах его нет — тогда notice.js берёт своё
+      чтение localStorage (в нём есть своя страховка) -->
+  <script src="notice.js" defer></script>
 
 </body>
 </html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<!--
+  СТРАНИЦА «ДОБАВИТЬ РЕЦЕПТ»
+
+  Форма размечена ТЕГАМИ, а не собрана из JS. Причины:
+    · поля видно глазами, порядок правок понятен без чтения кода;
+    · label + input работают с клавиатуры и с программой чтения экрана
+      «из коробки», руками такую доступность собирают долго;
+    · JS занимается только тем, для чего он нужен: проверил, сохранил,
+      дал ссылку.
+
+  Файл полей НЕ загружает: статический сайт никуда ничего не
+  принимает, поэтому «фото» — выбор эмодзи из готового списка.
+-->
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Добавить рецепт — Дотерская харчевня</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- правила сайта и плашка про хранилище: см. notice.js -->
+  <link rel="stylesheet" href="notice.css">
+</head>
+
+<body>
+
+  <div class="page-nav">
+    <a class="back-link" href="index.html">← На главную</a>
+  </div>
+
+  <div id="account-bar"></div>
+
+  <main class="page">
+
+    <h1 class="page-title">➕ Добавить свой рецепт</h1>
+
+    <!-- ===== СООБЩЕНИЕ ДЛЯ ГОСТЯ =====
+       hidden ставит/снимает recipes-user.js. Гостю форма не показана:
+       сохранить всё равно не даст, а мучить человека заполнением
+       двадцати полей вхолостую — просто портить вечер. -->
+    <section id="add-gate" class="gate" hidden>
+      <p class="gate-text">Рецепты добавляют только вошедшие: запись должна
+        знать автора, чтобы ты мог её удалить и чтобы подпись была честной.</p>
+      <a class="btn" href="account.html#login">Войти или зарегистрироваться</a>
+    </section>
+
+    <!-- ===== ФОРМА ===== -->
+    <form class="form form-wide" id="add-form" novalidate hidden>
+
+      <p class="form-note">
+        Всё, что здесь написано, сохранится в браузере этого компьютера
+        и появится в «Народной базе». Отзывов и рецептов других людей
+        ты не увидишь — для статического сайта это нормальное
+        ограничение, оно уходит, когда появляется сервер.
+      </p>
+
+      <!-- ДВА КОРОТКИХ ПОЛЯ В РЯД: класс .field-row делает из них
+           сетку, на телефоне она складывается в столбик. -->
+      <div class="field-row">
+        <label class="field">
+          <span class="field-name">Название</span>
+          <input class="field-input" id="ar-title" type="text" required
+                 maxlength="60" placeholder="Пельмени «Рошан»">
+        </label>
+
+        <label class="field">
+          <span class="field-name">Эмодзи-обложка</span>
+          <!-- select вместо поля ввода: варианты ограничены, и в
+               карточке не окажется случайного «🚽» или текста.
+               Значение option = то, что уедет в данные, текст внутри =
+               то, что видит человек. -->
+          <select class="field-input" id="ar-emoji">
+            <option value="🍲">🍲 суп</option>
+            <option value="🥟">🥟 лепим</option>
+            <option value="🍝">🍝 паста</option>
+            <option value="🍕">🍕 пицца</option>
+            <option value="🥗">🥗 салат</option>
+            <option value="🍳">🍳 яйца</option>
+            <option value="🥞">🥞 блины</option>
+            <option value="🍛">🍛 рис/гречка</option>
+            <option value="🍖">🍖 мясо</option>
+            <option value="🐟">🐟 рыба</option>
+            <option value="🥐">🥐 выпечка</option>
+            <option value="🍰">🍰 десерт</option>
+            <option value="🥤">🥤 напиток</option>
+            <option value="🍽">🍽 другое</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="field-row">
+        <label class="field">
+          <span class="field-name">Сколько готовить</span>
+          <input class="field-input" id="ar-time" type="text" required
+                 maxlength="30" placeholder="40 мин">
+        </label>
+
+        <label class="field">
+          <span class="field-name">На сколько порций</span>
+          <input class="field-input" id="ar-portions" type="text" required
+                 maxlength="30" placeholder="4 порции">
+        </label>
+
+        <label class="field">
+          <span class="field-name">Сложность</span>
+          <select class="field-input" id="ar-difficulty">
+            <option value="легко">легко</option>
+            <option value="средне" selected>средне</option>
+            <option value="сложно">сложно</option>
+          </select>
+        </label>
+      </div>
+
+      <label class="field">
+        <span class="field-name">Описание для карточки</span>
+        <textarea class="field-input" id="ar-intro" rows="2" maxlength="180"
+                  placeholder="Пара фраз: что это и зачем его готовить."></textarea>
+        <span class="field-hint">До 180 символов. Это видно на главной,
+          когда рецепт попадёт в народную базу.</span>
+      </label>
+
+      <!-- ТЕКСТОВЫЕ ПОЛЯ СО СПИСКАМИ.
+           Принципиальное решение: один ингредиент = одна строка.
+           JS разбивает текст по \n и получает массив — ровно ту же
+           структуру, что у рецептов автора сайта в коде.
+           Почему не «плюс одна кнопка на ингредиент»: пришлось бы
+           рисовать двадцать рядов кнопок и хранить их состояние, а
+           результат был бы тот же. -->
+      <label class="field">
+        <span class="field-name">Ингредиенты — по одному на строку</span>
+        <textarea class="field-input" id="ar-ingredients" rows="7" required
+                  placeholder="Мука — 300 г&#10;Яйца — 1 шт.&#10;Вода ледяная — 150 мл&#10;Соль — щепотка"></textarea>
+        <span class="field-hint">Минимум 2 строки, максимум 20.
+          Размер пиши прямо в строке: «Лук — 2 шт.».</span>
+      </label>
+
+      <label class="field">
+        <span class="field-name">Шаги приготовления — по одному на строку</span>
+        <textarea class="field-input" id="ar-steps" rows="8" required
+                  placeholder="Замесить тесто и дать отдохнуть 30 минут&#10;Раскатать тонко, вырезать кружки&#10;Варить 3 минуты после всплытия"></textarea>
+        <span class="field-hint">Минимум 2 строки, максимум 20. Номера
+          проставятся сами — для нумерованных шагов в HTML есть ol,
+          цифры руками не пишут.</span>
+      </label>
+
+      <label class="field">
+        <span class="field-name">Совет (необязательно)</span>
+        <input class="field-input" id="ar-tip" type="text" maxlength="180"
+               placeholder="Тесто отдыхает обязательно, иначе пельмени стянет.">
+      </label>
+
+      <p class="form-msg" id="add-msg" role="alert"></p>
+
+      <button class="btn btn-submit" type="submit">Опубликовать рецепт</button>
+
+      <a class="btn btn-ghost" href="community.html">Открыть народную базу</a>
+
+    </form>
+
+  </main>
+
+  <footer class="footer">
+    <p>© 2026 Дотерская харчевня</p>
+  </footer>
+
+  <script src="store.js" defer></script>
+  <script src="ui.js" defer></script>
+  <script src="auth.js" defer></script>
+  <script src="recipes-user.js" defer></script>
+
+  <!-- окно регламента и плашка про хранилище. Стоит последним:
+      на страницах корня Store к этому моменту уже подключён,
+      а в разделах его нет — тогда notice.js берёт своё
+      чтение localStorage (в нём есть своя страховка) -->
+  <script src="notice.js" defer></script>
+
+</body>
+</html>

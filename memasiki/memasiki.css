@@ -1,0 +1,892 @@
+/* ==========================================================================
+   memasiki.css — ТЁМНАЯ ТЕМА РАЗДЕЛА «МЕМАСИКИ»
+
+   Раздел оформлен отдельно от основного сайта и не подключает
+   style.css: там светлая кремовая тема, здесь намеренно тёмная —
+   раздел про ночное пати, а не про борщ.
+
+   Порядок файла:
+     1. переменные;
+     2. база (сброс отступов, шрифт, фон);
+     3. шапка и фильтры;
+     4. карточка RecipeCard;
+     5. свечение Аегиса;
+     6. окно возраста;
+     7. подвал;
+     8. адаптив и уважение к prefers-reduced-motion.
+   ========================================================================== */
+
+
+/* ==========================================================================
+   1. ПЕРЕМЕННЫЕ
+   ========================================================================== */
+
+:root {
+  --bg: #0e1116;            /* фон страницы — почти чёрный с синевой */
+  --bg-soft: #131922;       /* фон полос фильтров и подвала */
+  --card: #171d26;          /* фон карточки */
+  --card-soft: #1d2531;     /* фон врезок внутри карточки */
+  --line: #2a3442;          /* тонкие рамки */
+  --text: #e9e7e2;          /* основной текст: контраст с фоном 14:1 */
+  --text-soft: #9aa4b0;     /* второстепенный: контраст 6.6:1, минимум 4.5 */
+  --accent: #c9a227;        /* золото Аегиса — заголовки фильтров, ссылки */
+  --aegis: #ffab2e;         /* тот самый оранжевый, которым светится бейдж */
+  --dire: #d4342a;          /* красный Dire: возраст, ошибки, Immortal */
+  --radius: 14px;
+  --gap: 18px;
+}
+
+
+/* ==========================================================================
+   2. БАЗА
+   ========================================================================== */
+
+/* border-box: ширина элемента считается ВМЕСТЕ с рамкой и отступами,
+   иначе сетка на 100% вылезает за экран и появляется горизонтальная
+   прокрутка. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+/* Атрибут hidden должен выигрывать у любого display, поэтому !important.
+   Без него секция с display: block всё равно осталась бы видимой. */
+[hidden] {
+  display: none !important;
+}
+
+h1,
+h2,
+h3,
+p,
+ul,
+ol {
+  margin: 0;
+}
+
+
+/* ==========================================================================
+   3. ШАПКА И ФИЛЬТРЫ
+   ========================================================================== */
+
+.section-head,
+.filters,
+.grid,
+.result,
+.footer {
+  width: 100%;
+  max-width: 1180px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.section-head {
+  padding-top: 28px;
+  padding-bottom: 8px;
+}
+
+.section-title {
+  font-size: clamp(28px, 5vw, 44px);
+  letter-spacing: 1px;
+  color: var(--text);
+}
+
+.section-tagline {
+  color: var(--text-soft);
+  max-width: 60ch;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 10px;
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+.back-link:hover {
+  border-bottom-color: var(--accent);
+}
+
+.filters {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  background: var(--bg-soft);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  max-width: 100%;
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-label {
+  color: var(--text-soft);
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  min-width: 150px;
+}
+
+/* КНОПКА-ЧИП.
+   border: none + свой фон: у кнопки по умолчанию серый градиент
+   операционной системы, он не убирается одним background. */
+.chip {
+  padding: 6px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--text-soft);
+  font: inherit;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.chip:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+.chip-on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #14100a;
+  font-weight: 600;
+}
+
+.result {
+  margin-top: 20px;
+  color: var(--text-soft);
+  font-size: 15px;
+}
+
+
+/* ==========================================================================
+   4. КАРТОЧКА RecipeCard
+   ========================================================================== */
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--gap);
+  margin-top: 22px;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.card-featured {
+  background: linear-gradient(160deg, #1d2531 0%, #171d26 60%);
+  border-color: #3a4553;
+}
+
+.card-adult {
+  border-style: dashed;
+  border-color: #4a2b2b;
+}
+
+/* ПЛАШКА В УГЛУ */
+.card-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--card-soft);
+  border: 1px solid var(--line);
+  color: var(--text-soft);
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+/* КАРТИНКА.
+   Эмодзи лежит ПОВЕРХ фона, а <img> — поверх эмодзи. Не нашлось
+   файла — картинка удаляется скриптом, эмодзи остаётся. Так страница
+   не покрывается серыми квадратами «изображение не найдено». */
+.card-art {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+  border-radius: calc(var(--radius) - 4px);
+  background: radial-gradient(circle at 30% 20%, #223045 0%, #131a24 70%);
+  font-size: 54px;
+  overflow: hidden;
+}
+
+.card-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-title {
+  font-size: 24px;
+  line-height: 1.25;
+  letter-spacing: 0.5px;
+}
+
+.card-featured .card-title {
+  font-size: 30px;
+}
+
+.card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  color: var(--text-soft);
+  font-size: 14px;
+}
+
+/* РАНГИ MMR — цвет каждого свой, как на экране статистики. */
+.mmr {
+  font-weight: 600;
+}
+
+.mmr-herald {
+  color: #9aa4b0;
+}
+
+.mmr-guardian {
+  color: #6fb3d6;
+}
+
+.mmr-crusader {
+  color: #7fd66f;
+}
+
+.mmr-archon {
+  color: #d6d06f;
+}
+
+.mmr-legend {
+  color: #d69a4f;
+}
+
+.mmr-ancient {
+  color: #d96fb0;
+}
+
+.mmr-divine {
+  color: #6fd6d0;
+}
+
+.mmr-immortal {
+  color: #ff6b5e;
+}
+
+.card-age {
+  color: var(--dire);
+  font-weight: 600;
+}
+
+.card-quote {
+  padding: 10px 14px;
+  border-left: 3px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  background: var(--card-soft);
+  color: var(--text-soft);
+  font-style: italic;
+  font-size: 15px;
+}
+
+.block-title {
+  margin-top: 4px;
+  color: var(--accent);
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+/* СПИСОК ИНГРЕДИЕНТОВ — три колонки: продукт, количество, роль.
+   На узком экране grid перестроится в две строки (см. адаптив). */
+.ing-list {
+  display: grid;
+  gap: 6px;
+  padding: 0;
+  list-style: none;
+}
+
+.ing-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed var(--line);
+}
+
+.ing-name {
+  color: var(--text);
+}
+
+.ing-amount {
+  color: var(--text-soft);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.ing-role {
+  grid-column: 1 / -1;
+  color: var(--accent);
+  font-size: 13px;
+}
+
+/* <details>/<summary> — раскрывающийся блок без JS.
+   list-style: none убирает треугольник в Firefox, маркер в WebKit
+   убирается отдельным правилом. */
+.steps-box {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--card-soft);
+}
+
+.steps-box > summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.steps-box > summary::-webkit-details-marker {
+  display: none;
+}
+
+.steps-list {
+  margin-top: 10px;
+  padding-left: 22px;
+  display: grid;
+  gap: 8px;
+}
+
+.step-item {
+  color: var(--text-soft);
+}
+
+.step-item::marker {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.quote-list {
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+}
+
+.quote-item {
+  color: var(--text-soft);
+  font-size: 15px;
+  font-style: italic;
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0;
+  list-style: none;
+  margin-top: auto;
+}
+
+.tag {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--card-soft);
+  border: 1px solid var(--line);
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+/* КНОПКА.
+   margin-top: auto прижимает кнопку к низу карточки, чтобы в сетке
+   кнопки всех карточек стояли на одной линии, даже если рецепты
+   разной длины. */
+.btn {
+  align-self: flex-start;
+  margin-top: auto;
+  padding: 10px 18px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: var(--accent);
+  color: #14100a;
+}
+
+
+/* ==========================================================================
+   5. СВЕЧЕНИЕ АЕГИСА
+   ==========================================================================
+
+   @keyframes описывает, как меняется свойство со временем: 0% — начало,
+   50% — середина, 100% — конец цикла. Браузер сам дорисует промежуточные
+   кадры. animation на карточке запускает эти кадры по кругу (infinite)
+   и плавно (ease-in-out), иначе свечение дёргалось бы. */
+@keyframes aegis-pulse {
+  0% {
+    box-shadow: 0 0 0 1px rgba(255, 171, 46, 0.55),
+                0 0 10px rgba(255, 171, 46, 0.30);
+  }
+
+  50% {
+    box-shadow: 0 0 0 1px rgba(255, 171, 46, 0.95),
+                0 0 26px rgba(255, 171, 46, 0.70);
+  }
+
+  100% {
+    box-shadow: 0 0 0 1px rgba(255, 171, 46, 0.55),
+                0 0 10px rgba(255, 171, 46, 0.30);
+  }
+}
+
+.card-badge-legend {
+  background: linear-gradient(135deg, #ffd479 0%, var(--aegis) 55%, #ff8c1a 100%);
+  border-color: var(--aegis);
+  color: #1a1206;
+  font-weight: 700;
+  animation: aegis-pulse 2.4s ease-in-out infinite;
+}
+
+/* Свечение карточки легенды: при наведении усиливается.
+   transition — плавный переход между двумя состояниями; без него
+   свечение включалось бы мгновенно. */
+.card-legend {
+  border-color: rgba(255, 171, 46, 0.45);
+  box-shadow: 0 0 18px rgba(255, 171, 46, 0.12);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.card-legend:hover {
+  box-shadow: 0 0 34px rgba(255, 171, 46, 0.35);
+  transform: translateY(-3px);
+}
+
+.card-legend .card-title {
+  color: var(--aegis);
+}
+
+
+/* ==========================================================================
+   6. ОКНО ВОЗРАСТА
+   ========================================================================== */
+
+/* position: fixed — элемент прибит к окну браузера и не уезжает
+   при прокрутке. inset: 0 — растянуть на всё окно сразу по четырём
+   сторонам (то же самое, что top/right/bottom/left: 0). */
+.agegate {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(6, 8, 11, 0.82);
+  backdrop-filter: blur(3px);
+}
+
+.agegate-box {
+  width: 100%;
+  max-width: 460px;
+  display: grid;
+  gap: 14px;
+  padding: 26px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.6);
+}
+
+.agegate-title {
+  font-size: 24px;
+}
+
+.agegate-text {
+  color: var(--text-soft);
+}
+
+.btn-yes {
+  background: var(--accent);
+  color: #14100a;
+}
+
+.btn-yes:hover {
+  background: #e0b62e;
+  color: #14100a;
+}
+
+.btn-no {
+  border-color: var(--line);
+  color: var(--text-soft);
+}
+
+.btn-no:hover {
+  background: var(--card-soft);
+  color: var(--text);
+}
+
+
+/* ==========================================================================
+   7. ПОДВАЛ
+   ========================================================================== */
+
+.footer {
+  margin-top: 40px;
+  padding-top: 22px;
+  padding-bottom: 30px;
+  border-top: 1px solid var(--line);
+  background: var(--bg-soft);
+  color: var(--text-soft);
+  font-size: 15px;
+}
+
+.footer-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.footer-link {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.footer-link:hover {
+  border-bottom-color: var(--accent);
+}
+
+
+/* ==========================================================================
+   8. АДАПТИВ И ДОСТУПНОСТЬ
+   ==========================================================================
+
+   min-width: срабатывает, КОГДА экран стал шире указанного. Пишут
+   сначала мобильную версию (одна колонка), потом постепенно добавляют
+   колонки — так проще, чем отменять лишнее. */
+@media (min-width: 760px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .ing-item {
+    grid-template-columns: 1fr auto auto;
+    align-items: baseline;
+  }
+
+  .ing-role {
+    grid-column: auto;
+    text-align: right;
+    min-width: 96px;
+  }
+}
+
+@media (min-width: 1120px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* Избранная карточка растягивается на всю ширину сетки:
+     1 / -1 — от первой линии до последней (минус первая линия). */
+  .card-featured {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    align-items: start;
+    column-gap: 28px;
+  }
+
+  .card-featured .card-art {
+    grid-column: 1 / -1;
+    min-height: 180px;
+  }
+
+  .card-featured .card-badge {
+    top: 22px;
+    right: 22px;
+  }
+}
+
+/* Фокус с клавиатуры. :focus-visible — рамка только когда навигация
+   идёт с Tab, при клике мышью она не мешает. Без этой рамки человек
+   с клавиатуры не видит, где находится. */
+.chip:focus-visible,
+.btn:focus-visible,
+.back-link:focus-visible,
+.footer-link:focus-visible,
+.steps-box > summary:focus-visible {
+  outline: 3px solid var(--aegis);
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
+   9. СТРАНИЦА КОКТЕЙЛЯ (ЛЕГЕНДЫ)
+
+   Классы с префиксом legend- — только про эту страницу: карточки
+   раздела их не видят, а страница-легенда не тянет сетку .grid.
+   ========================================================================== */
+
+.legend-wrap {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 26px 20px 40px;
+}
+
+.legend-photo {
+  position: relative;
+  display: grid;
+  place-items: center;
+  /* 220px: постер показывается целиком (contain), и на меньшей высоте
+     от него осталась бы нечитаемая полоска. */
+  min-height: 220px;
+  margin-bottom: 18px;
+  font-size: 72px;
+  background: radial-gradient(circle at 30% 25%, rgba(212, 168, 67, 0.28),
+              rgba(200, 55, 60, 0.22) 55%, rgba(23, 28, 36, 1) 78%);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  /* Картинка внутри лежит абсолютно и покрывает весь блок. Без
+     overflow:hidden её углы вылезли бы за скругление блока. */
+}
+
+/* КАРТИНКА НА СТРАНИЦЕ РЕЦЕПТА.
+   Тот же приём, что в карточках: эмодзи лежит ПОД картинкой. Файла
+   нет — скрипт убирает img, остаётся 🍸 на градиенте.
+   Здесь картинка показывается ЦЕЛИКОМ (contain), а не обрезком: это
+   постер с надписями, и обрезать его — потерять текст. Пустые поля по
+   бокам закрывает градиент блока, поэтому выглядит как рамка. */
+.legend-photo > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+.legend-title {
+  font-size: 34px;
+  line-height: 1.15;
+}
+
+.legend-tagline {
+  margin-top: 8px;
+  color: var(--text-soft);
+  font-size: 17px;
+}
+
+/* Сетка характеристик: auto-fit + minmax — сколько колонок влезло,
+   столько и встало, отдельного медиа-запроса не нужно. */
+.legend-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin: 22px 0;
+  padding: 16px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.stat-key {
+  display: block;
+  color: var(--text-soft);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.stat-value {
+  display: block;
+  margin-top: 4px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.legend-quote {
+  margin: 0 0 26px;
+  padding: 16px 20px;
+  background: var(--card-soft);
+  border-left: 4px solid var(--accent);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  color: var(--text);
+  font-style: italic;
+}
+
+.legend-section-title {
+  margin: 30px 0 12px;
+  padding-left: 12px;
+  border-left: 4px solid var(--aegis);
+  font-size: 22px;
+}
+
+/* Список ингредиентов: имя | количество | роль.
+   1fr auto auto — имя тянется, остальное по ширине содержимого. */
+.legend-ings {
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.legend-ing {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2px;
+  padding: 12px 14px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.legend-ing-name {
+  font-weight: 700;
+}
+
+.legend-ing-amount {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.legend-ing-role {
+  color: var(--text-soft);
+  font-size: 14px;
+}
+
+/* Шаги. Нумерация берётся из HTML-разметки <ol>, а вид — из CSS:
+   span с номером лежит в разметке, чтобы номер читался с экрана. */
+.legend-steps {
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+
+.legend-step {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 12px;
+  padding: 14px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.legend-step-num {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 171, 46, 0.14);
+  border: 1px solid var(--aegis);
+  border-radius: 50%;
+  color: var(--aegis);
+  font-weight: 700;
+}
+
+.legend-quotes {
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.legend-quote-item {
+  padding: 12px 16px;
+  background: var(--card-soft);
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  color: var(--text-soft);
+  font-style: italic;
+}
+
+.legend-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  margin-top: 12px;
+}
+
+.legend-tag {
+  padding: 5px 12px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--accent);
+  font-size: 13px;
+}
+
+@media (min-width: 700px) {
+  .legend-photo {
+    /* 340px, а не 200: постер квадратный, а показываем его ЦЕЛИКОМ
+       (contain). В блоке высотой 200px от постера осталась бы узкая
+       полоска. 340 — примерно та высота, при которой постер читается,
+       но ещё не вытесняет рецепт за первый экран. */
+    min-height: 340px;
+    font-size: 96px;
+  }
+
+  .legend-ing {
+    grid-template-columns: 1fr auto auto;
+    align-items: baseline;
+    gap: 16px;
+  }
+}
+
+/* Пользователь просил систему отключить анимацию — уважаем:
+   свечение и подъём карточки выключаются, цвета остаются. */
+@media (prefers-reduced-motion: reduce) {
+  .card-badge-legend {
+    animation: none;
+  }
+
+  .card-legend,
+  .card-legend:hover {
+    transition: none;
+    transform: none;
+  }
+}

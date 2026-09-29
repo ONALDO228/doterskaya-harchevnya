@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<!--
+  СТРАНИЦА «НАРОДНАЯ БАЗА» — рецепты, которые добавили люди
+
+  Пустой контейнер + JS — осознанный выбор, а не лень верстать.
+  Количество рецептов неизвестно: сегодня их ноль, завтра сорок.
+  Вписать их в HTML руками — значит каждый раз руками же добавлять
+  карточку. Здесь карточку создаёт код по данным, поэтому «добавить
+  рецепт» и «показать рецепт» — это один и тот же механизм, а не
+  правка разметки.
+
+  Тот же приём уже работает в разделе «Мемасики» (memasiki/app.js).
+-->
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Народная база рецептов — Дотерская харчевня</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- правила сайта и плашка про хранилище: см. notice.js -->
+  <link rel="stylesheet" href="notice.css">
+</head>
+
+<body>
+
+  <div class="page-nav">
+    <a class="back-link" href="index.html">← На главную</a>
+  </div>
+
+  <div id="account-bar"></div>
+
+  <main class="page">
+
+    <h1 class="page-title">🌐 Народная база</h1>
+
+    <p class="page-lead">
+      Рецепты посетителей. Добавил свой — попал сюда и в кнопку
+      «🎲 Что готовим?» на главной.
+    </p>
+
+    <!-- Всё содержимое рисует UserRecipes.renderCommunity():
+         счётчик, поиск, переключатель «только мои», сетка карточек. -->
+    <section id="community-list"></section>
+
+  </main>
+
+  <footer class="footer">
+    <p>© 2026 Дотерская харчевня</p>
+  </footer>
+
+  <!-- Отзывы подключены и здесь: у народного рецепта есть своя
+       страница, но ссылка «мой отзыв» из кабинета ведёт именно на
+       список отзывов, а он живёт в reviews.js. -->
+  <script src="store.js" defer></script>
+  <script src="ui.js" defer></script>
+  <script src="auth.js" defer></script>
+  <script src="reviews.js" defer></script>
+  <script src="recipes-user.js" defer></script>
+
+  <!-- окно регламента и плашка про хранилище. Стоит последним:
+      на страницах корня Store к этому моменту уже подключён,
+      а в разделах его нет — тогда notice.js берёт своё
+      чтение localStorage (в нём есть своя страховка) -->
+  <script src="notice.js" defer></script>
+
+</body>
+</html>

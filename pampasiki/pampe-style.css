@@ -1,0 +1,388 @@
+/* ==========================================================================
+   pampe-style.css — РАЗДЕЛ «ПАМПАСИКИ»
+
+   Файл работает ТОЛЬКО с пампе.html. Общий style.css сайта не подключён,
+   поэтому цвета здесь продублированы в :root — но ОДНИМ местом, чтобы
+   перекраска раздела оставалась правкой нескольких строк, а не файла.
+
+   Порядок внутри файла = порядок на странице:
+     переменные → база → шапка → оглавление → карточка рецепта → подвал.
+   media query всегда в конце того блока, которого касается, а не
+   свалены в конец файла: иначе при правке карточки правило «на телефон»
+   ищется получасом.
+   ========================================================================== */
+
+
+/* ==========================================================================
+   1. ПЕРЕМЕННЫЕ
+   ========================================================================== */
+
+:root {
+  --accent: #b70101;        /* красный Dire: кнопки, заголовки, ссылки */
+  --accent-dark: #821610;   /* темнее accent: hover и фокус. Темнее — обязательно */
+  --accent-2: #4a0805;      /* второй цвет градиента шапки */
+  --text: #2d2a26;          /* основной текст. Не #000: чистый чёрный режет глаза */
+  --text-soft: #6d635a;     /* второстепенный: время, порции. Контраст с фоном 5.5:1 */
+  --bg: #fdf8f3;            /* фон страницы */
+  --card-bg: #ffffff;       /* фон карточки рецепта */
+  --ing-bg: #fbf3ec;        /* фон колонки с ингредиентами */
+  --line: #eadfd5;          /* тонкие рамки */
+  --tip-bg: #fff0ee;        /* врезка «Совет» */
+  --radius: 14px;
+  --gap: 20px;              /* единый шаг отступов между блоками */
+}
+
+
+/* ==========================================================================
+   2. БАЗА
+   ========================================================================== */
+
+* {
+  box-sizing: border-box;
+  /* Считать ширину ВКЛЮЧАЯ рамку и padding. Без этой строки блок
+     шириной 100% с рамкой вылезает за экран, и страница уезжает
+     в горизонтальную прокрутку. */
+}
+
+html {
+  scroll-behavior: smooth;
+  /* Прыжок по ссылке из оглавления — плавно. Работает вместе с
+     scroll-margin-top у .recipe. */
+}
+
+/* Люди, у которых от анимации мутит (vestibular disorder), отключают
+   анимации в системе. Этот запрос уважает их настройку: без него
+   плавная прокрутка — вред, а не красота. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  margin: 0;
+  /* У body браузер даёт 8px со всех сторон — из-за них шапка
+     не прилегает к краю и вокруг белая рамка. */
+
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  /* Список: берётся первый найденный в системе. Никакого Google Fonts:
+     сайт открывается и без интернета. */
+
+  background-color: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  /* Картинка не растянется и не выломает вёрстку, если её вставят. */
+}
+
+/* Общее ограничение ширины: текст в 40 слов на строку не читается. */
+.page,
+.header-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+
+/* ==========================================================================
+   3. ШАПКА
+   ========================================================================== */
+
+.header {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  /* 135deg — из левого верхнего угла в правый нижний.
+     background по умолчанию НЕ повторяет картинку, поэтому
+     background-repeat здесь не нужен: у градиента нет тайла. */
+
+  color: #fff;
+  padding: 48px 0 40px;
+  text-align: center;
+}
+
+.header-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.logo {
+  margin: 0;
+  /* У h1 браузерные отступы огромные — без обнуления шапка
+     вырастает в пол-экрана пустоты. */
+
+  font-size: 40px;
+}
+
+.tagline {
+  margin: 10px 0 0;
+  font-size: 17px;
+  opacity: .9;
+}
+
+
+/* Кнопка «назад». <nav> нужен не для красоты, а чтобы программа
+   чтения с экрана объявила этот кусок как навигацию: см. aria-label
+   в HTML. Без aria-label на странице три безымянные <nav>, и
+   непонятно, где какая. */
+.nav {
+  padding: 18px 0;
+}
+
+.back-link {
+  display: inline-block;
+  /* Ссылка по умолчанию inline: у неё нельзя нормально задать
+     padding и фон. inline-block оставляет её в строке, но даёт
+     размеры. */
+
+  color: var(--accent);
+  text-decoration: none;
+  /* У ссылок браузер рисует подчёркивание сам. У ссылок-кнопок
+     его убирают всегда. */
+
+  font-size: 15px;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--card-bg);
+  transition: background .18s ease, color .18s ease;
+}
+
+.back-link:hover {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+/* Рамка появления ТОЛЬКО при навигации с клавиатуры (Tab).
+   При обычном клике её нет — она бы мешалась. Без этой рамки
+   человек с клавиатуры не видит, где курсор. */
+.back-link:focus-visible,
+.toc-link:focus-visible {
+  outline: 3px solid var(--accent-dark);
+  outline-offset: 2px;
+}
+
+
+/* ==========================================================================
+   4. ВВОДНАЯ И ОГЛАВЛЕНИЕ
+   ========================================================================== */
+
+.page {
+  padding-top: 8px;
+  padding-bottom: 40px;
+}
+
+.intro {
+  font-size: 17px;
+  margin: 0 0 var(--gap);
+}
+
+.intro-strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.toc {
+  background: var(--card-bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin: 0 0 32px;
+}
+
+.toc-title {
+  margin: 0 0 12px;
+  font-size: 18px;
+}
+
+/* Список ссылок. list-style: none убирает точки — здесь это список
+   кнопок, а не перечень. */
+.toc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  display: grid;
+  /* auto-fill + minmax = «сколько влезет колонок по 220px».
+     Это ВСЯ адаптивность оглавления: на телефоне одна колонка,
+     на десктопе четыре, media query не нужен. */
+
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.toc-link {
+  display: block;
+  /* Блок, а не строка: тогда кликабельна ВСЯ плашка, а не только
+     текст в ней. Попадать мышкой по 15px текста неудобно. */
+
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--ing-bg);
+  color: var(--text);
+  text-decoration: none;
+  font-size: 15px;
+  transition: background .18s ease, color .18s ease;
+}
+
+.toc-link:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+
+/* ==========================================================================
+   5. КАРТОЧКА РЕЦЕПТА
+   ========================================================================== */
+
+.recipes {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  /* Вертикальный список: рецепты читают по одному, а не сравнивают.
+     В сетку их складывать не нужно. */
+}
+
+.recipe {
+  background: var(--card-bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 24px;
+
+  scroll-margin-top: 20px;
+  /* Когда прыгаем по ссылке из оглавления, заголовок впритыкается
+     в верх окна. Эта строка оставляет запас. */
+}
+
+/* Подсветка рецепта, к которому прыгнули по ссылке.
+   :target = «адрес в строке браузера заканчивается на id этого блока». */
+.recipe:target {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(183, 1, 1, .12);
+}
+
+.recipe-head {
+  margin: 0 0 18px;
+}
+
+.recipe-title {
+  margin: 0 0 6px;
+  font-size: 24px;
+  color: var(--accent-dark);
+}
+
+.recipe-meta {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-soft);
+}
+
+/* Внутри карточки — две колонки. Сначала одна (мобильная версия),
+   вторая появляется от 760px. */
+.recipe-body {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--gap);
+}
+
+@media (min-width: 760px) {
+  .recipe-body {
+    grid-template-columns: 260px 1fr;
+    /* 260px — колонка ингредиентов, остальное — шаги.
+       Фиксированные px здесь лучше 1fr/1fr: список продуктов
+       короткий, и тянуть его на пол-экрана бессмысленно. */
+  }
+}
+
+.ing {
+  background: var(--ing-bg);
+  border-radius: 10px;
+  padding: 16px;
+  align-self: start;
+  /* Иначе колонка растянется на высоту шагов, и у короткого списка
+     ингредиентов будет дурацкая пустая подложка снизу. */
+}
+
+.block-title {
+  margin: 0 0 10px;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--text-soft);
+}
+
+.ing-list {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.ing-list li {
+  margin-bottom: 6px;
+  font-size: 15px;
+}
+
+.steps-list {
+  margin: 0;
+  padding-left: 24px;
+}
+
+.steps-list li {
+  margin-bottom: 10px;
+  font-size: 15px;
+}
+
+/* Жирная первая фраза внутри шага — «что сделать», остальное — пояснение. */
+.step-lead {
+  font-weight: 600;
+}
+
+.tip {
+  margin: 18px 0 0;
+  padding: 14px 16px;
+  background: var(--tip-bg);
+  border-left: 4px solid var(--accent);
+  border-radius: 0 10px 10px 0;
+  font-size: 15px;
+}
+
+.tip-label {
+  display: block;
+  font-weight: 700;
+  color: var(--accent-dark);
+  margin-bottom: 4px;
+}
+
+
+/* ==========================================================================
+   6. ПОДВАЛ
+   ========================================================================== */
+
+.footer {
+  background: #1a0d0c;
+  color: #cbc3ba;
+  padding: 28px 0;
+  text-align: center;
+  font-size: 14px;
+}
+
+.footer-nav {
+  margin-bottom: 10px;
+}
+
+.footer-link {
+  color: #ffd7d7;
+  text-decoration: none;
+  margin: 0 8px;
+}
+
+.footer-link:hover {
+  text-decoration: underline;
+  /* Здесь подчёркивание уместно: это текстовая ссылка, а не кнопка. */
+}
+
+.footer p {
+  margin: 4px 0;
+}

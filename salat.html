@@ -9,15 +9,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Цезарь «Соло-рейндж» — Дотерский харч</title>
+  <title>Цезарь «Соло-рейндж» — Дотерская харчевня</title>
   <link rel="stylesheet" href="style.css">
+  <!-- правила сайта и плашка про хранилище: см. notice.js -->
+  <link rel="stylesheet" href="notice.css">
 </head>
 
-<body>
+<body data-recipe-id="salat" data-recipe-title="Цезарь «Соло-рейндж»">
+  <!-- data-recipe-id — ключ для отзывов. Совпадает с ключом в
+       reviews.pageOf(), где по нему находится ссылка на страницу. -->
 
   <div class="page-nav">
     <a class="back-link" href="index.html">← На главную</a>
   </div>
+
+  <div id="account-bar"></div>
 
   <main class="recipe">
 
@@ -29,10 +35,11 @@
     <!-- ФОТО ЦЕЛИКОМ.
          cover  = заполнить весь блок, лишнее ОБРЕЗАТЬ (превью, обложки)
          contain= показать ЦЕЛИКОМ, возможны пустые поля по краям
-         Здесь contain: картинка квадратная, блок широкий — по бокам
-         будут поля, их закрывает градиент плашки. Это нормально
-         и выглядит как задумка. -->
-    <div class="recipe-photo photo-radiant">
+         Здесь contain (класс fit-full): блок широкий и низкий, а фото
+         почти квадратное — по бокам останутся поля, их закрывает
+         градиент плашки. Выглядит как рамка, а не как дырка.
+         Файл тот же, что в карточке главной — img/salat.jpg. -->
+    <div class="recipe-photo photo-radiant">🥗
       <img class="recipe-img fit-full"
            src="img/salat.jpg"
            alt="Апельсинчик — он же салат"
@@ -78,9 +85,25 @@
     </div>
   </main>
 
+  <!-- Отзывы и рейтинг (рисует reviews.js) -->
+  <div class="page">
+    <section id="reviews"></section>
+  </div>
+
   <footer class="footer">
-    <p>© 2026 Дотерский харч</p>
+    <p>© 2026 Дотерская харчевня</p>
   </footer>
+
+  <script src="store.js" defer></script>
+  <script src="ui.js" defer></script>
+  <script src="auth.js" defer></script>
+  <script src="reviews.js" defer></script>
+
+  <!-- окно регламента и плашка про хранилище. Стоит последним:
+      на страницах корня Store к этому моменту уже подключён,
+      а в разделах его нет — тогда notice.js берёт своё
+      чтение localStorage (в нём есть своя страховка) -->
+  <script src="notice.js" defer></script>
 
 </body>
 </html>

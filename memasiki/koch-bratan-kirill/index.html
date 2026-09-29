@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Коктейль «Коч братан Кирилл» — мемасик ранга Immortal: девять ингредиентов по ролям, восемь шагов, градиент от синего к прозрачному. 18+.">
+  <title>🍸 Коч братан Кирилл — мемасик ранга Immortal</title>
+
+  <!-- Стили раздела лежат на уровень выше, поэтому ../ — путь вверх
+       от memasiki/koch-bratan-kirill/ к memasiki/. -->
+  <link rel="stylesheet" href="../memasiki.css">
+  <!-- правила сайта и плашка про хранилище: см. notice.js -->
+  <link rel="stylesheet" href="../../notice.css">
+
+  <script src="../data.js" defer></script>
+  <script src="../app.js" defer></script>
+</head>
+<body>
+
+  <!-- Окно возраста вставляет сюда себя app.js. Пока ответа нет,
+       рецепт под затемняющим слоем. -->
+  <div id="agegate-slot"></div>
+
+  <!-- ==================== РЕЦЕПТ ====================
+       id="legend-body" — этот блок app.js прячет, если ответил
+       «мне меньше 18»: hidden="hidden" здесь прописан заранее, чтобы
+       при медленной загрузке текст не мелькнул раньше времени. -->
+  <main class="legend-wrap" id="legend-body" hidden>
+
+    <a class="back-link" href="../index.html">← Все мемасики</a>
+
+    <!-- ФОТО-ПОСТЕР. Эмодзи 🍸 лежит ПОД картинкой: пока файла нет,
+         виден он на градиенте. Путь ../ — вверх из этой папки, потому
+         что картинки раздела лежат в memasiki/img/, а страница живёт в
+         memasiki/koch-bratan-kirill/. -->
+    <div class="legend-photo">🍸
+      <img src="../img/cocktails/koch-bratan-kirill.webp"
+           alt="Постер коктейля «Коч братан Кирилл»: бокал с синим градиентом,
+                мята, дольки лайма, вишня сверху и список ингредиентов справа">
+    </div>
+
+    <h1 class="legend-title">Коч братан Кирилл</h1>
+    <p class="legend-tagline">
+      Коктейль, который пикается первым и не контрится. Синий слой — река,
+      красная полоска на дне — полоска хп врага перед добиванием.
+    </p>
+
+    <!-- Характеристики: те же значения, что лежат в data.js -->
+    <div class="legend-stats">
+      <p class="stat"><span class="stat-key">Ранг</span>
+        <span class="stat-value">⭐ Immortal</span></p>
+      <p class="stat"><span class="stat-key">Время</span>
+        <span class="stat-value">⏱ 0:00</span></p>
+      <p class="stat"><span class="stat-key">Стек</span>
+        <span class="stat-value">🎒 8 предметов</span></p>
+      <p class="stat"><span class="stat-key">Бокал</span>
+        <span class="stat-value">🥃 хайбол</span></p>
+      <p class="stat"><span class="stat-key">Возраст</span>
+        <span class="stat-value">🔞 18+</span></p>
+    </div>
+
+    <blockquote class="legend-quote">
+      «Если после третьего ты не чувствуешь +25 MMR — значит ты Herald, братан.»
+    </blockquote>
+
+    <!-- ==================== ИНГРЕДИЕНТЫ ==================== -->
+    <h2 class="legend-section-title">Что лить</h2>
+    <ul class="legend-ings">
+      <li class="legend-ing">
+        <span class="legend-ing-name">Водка</span>
+        <span class="legend-ing-amount">50 мл</span>
+        <span class="legend-ing-role">керри</span>
+      </li>
+      <li class="legend-ing">
+        <span class="legend-ing-name">Blue Curaçao</span>
+        <span class="legend-ing-amount">20 мл</span>
+        <span class="legend-ing-role">мид</span>
+      </li>
+      <li class="legend-ing">
+        <span class="legend-ing-name">Спрайт</span>
+        <span class="legend-ing-amount">100 мл</span>
+        <span class="legend-ing-role">сапорт</span>
+      </li>
+      <li class="legend-ing">
+        <span class="legend-ing-name">Сок лайма</span>
+        <span class="legend-ing-amount">15 мл</span>
+        <span class="legend-ing-role">оффлейн</span>
+      </li>
+      <li class="legend-ing">
+        <span class="legend-ing-name">Гренадин</span>
+        <span class="legend-ing-amount">10 мл</span>
+        <span class="legend-ing-role">позиция 4</span>
+      </li>
+      <li class="legend-ing">
+        <span class="legend-ing-name">Лёд</span>
+        <span class="legend-ing-amount">5-6 кубиков</span>
+        <span class="legend-ing-role">позиция 5</span>
+      </li>
+      <li class="legend-ing">
+        <span class="legend-ing-name">Мята + лайм</span>
+        <span class="legend-ing-amount">по вкусу</span>
+        <span class="legend-ing-role">курьер</span>
+      </li>
+      <li class="legend-ing">
+        <span class="legend-ing-name">Вишня</span>
+        <span class="legend-ing-amount">1 шт</span>
+        <span class="legend-ing-role">аегис</span>
+      </li>
+    </ul>
+
+    <!-- ==================== ШАГИ ====================
+         <ol> — список с номерами: порядок шагов важен, сбрасывать
+         нумерацию нельзя. -->
+    <h2 class="legend-section-title">Как мешать</h2>
+    <ol class="legend-steps">
+      <li class="legend-step">
+        <span class="legend-step-num">1</span>
+        <span class="legend-step-text">Охладить хайбол. Набить бокал льдом
+          доверху, залить холодной водой и оставить на две минуты, пока
+          открываешь бутылки. Воду слить, лёд из бокала не выбрасывать —
+          он рабочий.</span>
+      </li>
+      <li class="legend-step">
+        <span class="legend-step-num">2</span>
+        <span class="legend-step-text">Налить водку — 50 мл. Это керри: весь
+          удар держит на себе. Льёт первой, потому что всё остальное пойдёт
+          поверх неё.</span>
+      </li>
+      <li class="legend-step">
+        <span class="legend-step-num">3</span>
+        <span class="legend-step-text">Долить Blue Curaçao — 20 мл, по стенке
+          бокала. Получается синий слой: та самая река на карте, по которой
+          сейчас пойдёт Спрайт.</span>
+      </li>
+      <li class="legend-step">
+        <span class="legend-step-num">4</span>
+        <span class="legend-step-text">Влить сок лайма — 15 мл. Без кислоты
+          коктейль приторный, как комменты после слива дефа.</span>
+      </li>
+      <li class="legend-step">
+        <span class="legend-step-num">5</span>
+        <span class="legend-step-text">Долить Спрайт — 100 мл, тонкой струёй
+          по стенке. Не мешать. Пузырьки сами поднимут синий слой вверх,
+          и выйдет градиент от синего к прозрачному.</span>
+      </li>
+      <li class="legend-step">
+        <span class="legend-step-num">6</span>
+        <span class="legend-step-text">Гренадин — 10 мл в самый последний
+          момент, по спирали изо льда. Он тяжелее всего и утонет на дно
+          красным: это полоска хп врага перед добиванием.</span>
+      </li>
+      <li class="legend-step">
+        <span class="legend-step-num">7</span>
+        <span class="legend-step-text">Мята и лайм. Мятную ветку шлёпнуть
+          между ладонями — так она отдаёт масло, а не сок. Уставить сверху,
+          дольку лайма — на край бокала.</span>
+      </li>
+      <li class="legend-step">
+        <span class="legend-step-num">8</span>
+        <span class="legend-step-text">Вишня — на дно, одна, через трубочку.
+          Это Аегис: её не пьют, её оставляют на последнее.
+          Готово, можно пушить.</span>
+      </li>
+    </ol>
+
+    <!-- ==================== ЦИТАТЫ ==================== -->
+    <h2 class="legend-section-title">Цитаты на пати</h2>
+    <ul class="legend-quotes">
+      <li class="legend-quote-item">«Коч братан Кирилл — коктейль, который
+        пикается первым и не контрится.»</li>
+      <li class="legend-quote-item">«Если после третьего ты не чувствуешь
+        +25 MMR — значит ты Herald, братан.»</li>
+      <li class="legend-quote-item">«Blue Curaçao = синий, как речка на карте.
+        Гренадин = красный, как хп врага.»</li>
+    </ul>
+
+    <!-- ==================== ХЭШТЕГИ ==================== -->
+    <h2 class="legend-section-title">Хэштеги</h2>
+    <ul class="legend-tags">
+      <li class="legend-tag">#мемасики</li>
+      <li class="legend-tag">#коктейль</li>
+      <li class="legend-tag">#коч</li>
+      <li class="legend-tag">#кирил</li>
+      <li class="legend-tag">#алкоголь</li>
+      <li class="legend-tag">#пати</li>
+    </ul>
+
+  </main>
+
+  <footer class="footer">
+    <div class="legend-wrap">
+      <p>Коч братан Кирилл · мемасик ранга Immortal · крепкий, 18+</p>
+      <div class="footer-row">
+        <a class="footer-link" href="../index.html">← Мемасики</a>
+        <a class="footer-link" href="../../index.html">На главную</a>
+        <button class="footer-link" type="button" id="age-reset">сменить возраст</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- окно регламента и плашка про хранилище. Стоит последним:
+      на страницах корня Store к этому моменту уже подключён,
+      а в разделах его нет — тогда notice.js берёт своё
+      чтение localStorage (в нём есть своя страховка) -->
+  <script src="../../notice.js" defer></script>
+
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<!--
+  СТРАНИЦА ОДНОГО НАРОДНОГО РЕЦЕПТА
+
+  ФАЙЛ ОДИН, а рецептов на нём может быть сколько угодно. Различаются
+  они адресом:
+
+      recipe-user.html?id=r-m3k2-9f1a
+
+  Идентификатор берётся из адреса (location.search), по нему находится
+  запись в localStorage, и страница собирается под неё. Так устроены
+  все сайты с карточками товаров: файл один, содержимое разное.
+
+  Поэтому в этом HTML НЕТ ни одного текста рецепта — только каркас.
+  Всё наполняет recipes-user.js.
+-->
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Заголовок вкладки ставит JS по названию рецепта. Без него на
+       всех вкладках было бы «Дотерская харчевня», и в десяти открытых
+       рецептах нельзя было бы разобраться. -->
+  <title>Народный рецепт — Дотерская харчевня</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- правила сайта и плашка про хранилище: см. notice.js -->
+  <link rel="stylesheet" href="notice.css">
+</head>
+
+<body>
+  <!-- data-recipe-id здесь НЕ вписан. Эта страница сама не знает, о
+       каком рецепте речь, — id приезжает в адресе. recipes-user.js
+       читает его, записывает сюда же (document.body.dataset.recipeId)
+       и только потом рисует отзывы. -->
+
+  <div class="page-nav">
+    <a class="back-link" href="community.html">← В народную базу</a>
+  </div>
+
+  <div id="account-bar"></div>
+
+  <main class="recipe">
+    <!-- Заголовок, фото, ингредиенты, шаги, кнопка удаления — всё
+         создаёт UserRecipes.renderOne(). -->
+    <section id="user-recipe"></section>
+
+    <!-- Отзывы. Тот же виджет, что на страницах рецептов автора сайта:
+         файл один, а рецепт определяется по data-recipe-id. -->
+    <section id="reviews"></section>
+  </main>
+
+  <footer class="footer">
+    <p>© 2026 Дотерская харчевня</p>
+  </footer>
+
+  <script src="store.js" defer></script>
+  <script src="ui.js" defer></script>
+  <script src="auth.js" defer></script>
+  <script src="reviews.js" defer></script>
+  <script src="recipes-user.js" defer></script>
+
+  <!-- окно регламента и плашка про хранилище. Стоит последним:
+      на страницах корня Store к этому моменту уже подключён,
+      а в разделах его нет — тогда notice.js берёт своё
+      чтение localStorage (в нём есть своя страховка) -->
+  <script src="notice.js" defer></script>
+
+</body>
+</html>

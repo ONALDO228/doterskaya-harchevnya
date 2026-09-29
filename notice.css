@@ -1,0 +1,375 @@
+/* ==========================================================================
+   notice.css — ОКНО РЕГЛАМЕНТА И ПЛАШКА ПРО ХРАНИЛИЩЕ
+
+   ПОЧЕМУ ОТДЕЛЬНЫЙ ФАЙЛ, ВЕДЬ ВСЕ СТИЛИ ЖИВУТ В style.css.
+   Окно регламента показывается на ВСЕХ страницах сайта, а стилевых
+   файлов у сайта три:
+     style.css            — корень (главная, рецепты, кабинет)
+     pampe-style.css      — раздел «Пампасики»
+     memasiki.css         — раздел «Мемасики», там своя тёмная тема
+   Правила из style.css на страницах этих разделов НЕ действуют: файл
+   просто не подключён. Если бы стили окна легли в style.css, в
+   «Мемасиках» окно вышло бы чёрно-белым. Отдельный файл подключается
+   одной строкой везде и выглядит одинаково всегда.
+
+   ЕЩЁ ОДНА ПРИЧИНА: у каждого раздела свои переменные --accent, --bg,
+   --text. Поэтому внутри этого файла все цвета СВОИ, они объявлены в
+   .notice-root и ни от чужих переменных не зависят. Иначе «золотая»
+   тёмная тема Мемасиков перекрасила бы окно себе, и вид менялся бы от
+   страницы к странице.
+   ========================================================================== */
+
+/* Свои переменные. Объявлены не в :root, а на .notice-root — чтобы
+   не расползлись по чужой вёрстке и не столкнулись с --accent раздела. */
+.notice-root {
+  --n-accent: #b70101;
+  --n-accent-dark: #821610;
+  --n-text: #2d2a26;
+  --n-text-soft: #6d635a;
+  --n-bg: #fffdfb;
+  --n-line: #eadfd5;
+  --n-radius: 14px;
+}
+
+/* ==========================================================================
+   1. ЗАТЕМНЕНИЕ ФОНА
+   ========================================================================== */
+
+.notice-overlay {
+  position: fixed;
+  /* fixed = прибит к экрану: страница под ним прокручивается, окно
+     стоит. absolute приполз бы из начала документа, и если человек
+     успел прокрутить вниз, окна он бы не увидел. */
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(20, 12, 10, 0.72);
+  /* rgba, а не прозрачность всего блока: opacity затемнила бы и само
+     окно вместе с текстом. */
+  z-index: 90;
+  /* Панели сайта живут в пределах z-index 1-10, окно обязано быть
+     выше всего, иначе любая плашка встанет поверх затемнения. */
+}
+
+/* Запрет прокрутки страницы под окном. Класс навешивает notice.js на
+   <body>. Без него колесо мыши крутило бы текст регламента ПОД окном. */
+body.notice-open {
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   2. САМО ОКНО
+   ========================================================================== */
+
+.notice-modal {
+  width: min(680px, 100%);
+  /* min() из двух: 680px, но не шире экрана минус поля. На телефоне
+     окно займёт всю ширину, а не вылезет за неё на 300px. */
+  max-height: min(86vh, 900px);
+  display: flex;
+  flex-direction: column;
+  background: var(--n-bg);
+  border-radius: var(--n-radius);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  /* overflow hidden нужен, чтобы шапка и подвал окна срезались по
+     скруглению углов. Само содержимое прокручивается внутри
+     .notice-body — см. overflow:auto там. */
+  animation: notice-in 0.25s ease-out;
+}
+
+@keyframes notice-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Системная настройка «убрать анимации» (у кого-то от них кружится
+     голова). В браузере её можно включить вручную — полезно проверить,
+     что без анимации окно всё равно удобно читать. */
+  .notice-modal {
+    animation: none;
+  }
+}
+
+/* --- Шапка окна --- */
+.notice-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px 20px 14px;
+  background: linear-gradient(135deg, var(--n-accent-dark), var(--n-accent));
+  color: #fff;
+  flex: none;
+  /* flex:none запрещает шапке сжиматься, когда содержимое длинное:
+     иначе при нехватке высоты она превратилась бы в полоску. */
+}
+
+.notice-head h2 {
+  margin: 0;
+  font-size: 21px;
+  line-height: 1.25;
+  color: inherit;
+  /* inherit обязателен: в style.css у h2 цвет задан числом, и без него
+     заголовок стал бы тёмно-красным на красном фоне. */
+}
+
+.notice-head p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+/* Крестик закрыть */
+.notice-close {
+  margin-left: auto;
+  /* auto прижимает кнопку в правый край: всё свободное место уходит
+     влево от неё. */
+  flex: none;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.18);
+  color: #fff;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.notice-close:hover {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+/* --- Прокручиваемая середина --- */
+.notice-body {
+  padding: 18px 20px;
+  overflow-y: auto;
+  /* auto: полоса появится только когда текста больше, чем места.
+     scroll рисовал бы пустую полосу всегда. */
+  color: var(--n-text);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.notice-body h3 {
+  margin: 18px 0 6px;
+  font-size: 15px;
+  color: var(--n-accent-dark);
+}
+
+.notice-body h3:first-child {
+  margin-top: 0;
+}
+
+.notice-body ul {
+  margin: 0 0 4px;
+  padding-left: 20px;
+}
+
+.notice-body li {
+  margin-bottom: 5px;
+}
+
+.notice-body strong {
+  color: var(--n-accent-dark);
+}
+
+.notice-note {
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  border-left: 3px solid var(--n-accent);
+  background: #fff0ee;
+  font-size: 13px;
+  color: var(--n-text-soft);
+}
+
+/* --- Подвал окна с кнопками --- */
+.notice-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+  padding: 14px 20px;
+  border-top: 1px solid var(--n-line);
+  background: #faf3ec;
+  flex: none;
+}
+
+/* ==========================================================================
+   3. КНОПКИ ВНУТРИ ОКНА
+   Свои классы, а не .btn из style.css — по той же причине: в
+   «Пампасиках» и «Мемасиках» своего .btn может и не быть.
+   ========================================================================== */
+
+.notice-btn {
+  padding: 10px 18px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.notice-btn-primary {
+  background: var(--n-accent);
+  color: #fff;
+}
+
+.notice-btn-primary:hover {
+  background: var(--n-accent-dark);
+}
+
+.notice-btn-ghost {
+  background: transparent;
+  border-color: var(--n-line);
+  color: var(--n-text-soft);
+}
+
+.notice-btn-ghost:hover {
+  border-color: var(--n-accent);
+  color: var(--n-accent-dark);
+}
+
+/* ==========================================================================
+   4. НИЖНЯЯ ПЛАШКА ПРО ХРАНИЛИЩЕ (cookie-бар)
+   ========================================================================== */
+
+.notice-cookie {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  z-index: 80;
+  /* ниже модалки (90): если открыт регламент, плашка не должна
+     маячить поверх его кнопок. */
+  max-width: 760px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: #ffffff;
+  border: 1px solid var(--n-line);
+  border-radius: var(--n-radius);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.22);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--n-text);
+  animation: notice-up 0.3s ease-out;
+}
+
+@keyframes notice-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Класс, который вешает notice.js за секунду до удаления: плашка
+   уезжает вниз и гаснет, а не исчезает рывком. */
+.notice-cookie.is-out {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.4s, transform 0.4s;
+}
+
+.notice-cookie p {
+  margin: 0;
+  flex: 1 1 320px;
+  /* 1 1 320px: расти, сжимайся, но не уже 320px — иначе на телефоне
+     текст стиснется в столбик по одному слову. */
+}
+
+.notice-cookie .notice-btn {
+  flex: none;
+  padding: 8px 14px;
+  font-size: 13px;
+}
+
+.notice-cookie-link {
+  flex: none;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--n-accent-dark);
+  font: inherit;
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   5. ССЫЛКА «РЕГЛАМЕНТ» В ПОДВАЛЕ
+   Её вставляет notice.js. Нужна, чтобы окно можно было открыть
+   повторно: согласился один раз — и больше не показывается, а
+   почитать правила когда-нибудь захочется.
+   ========================================================================== */
+
+.notice-footer-link {
+  display: inline-block;
+  margin-top: 6px;
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  opacity: 0.8;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.notice-footer-link:hover {
+  opacity: 1;
+}
+
+/* ==========================================================================
+   6. АДАПТИВ
+   ========================================================================== */
+
+@media (max-width: 560px) {
+  .notice-overlay {
+    padding: 10px;
+  }
+
+  .notice-head h2 {
+    font-size: 18px;
+  }
+
+  .notice-body {
+    padding: 14px;
+    font-size: 14px;
+  }
+
+  .notice-foot {
+    padding: 12px 14px;
+  }
+
+  .notice-btn {
+    /* На телефоне кнопки во всю ширину: попасть пальцем по узкой
+       «Принять» сложнее, чем по строке. */
+    flex: 1 1 100%;
+  }
+
+  .notice-cookie {
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    padding: 12px;
+  }
+}

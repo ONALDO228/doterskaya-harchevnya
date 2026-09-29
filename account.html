@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<!--
+  СТРАНИЦА «КАБИНЕТ» — вход, регистрация и всё своё добро
+
+  Как устроен этот файл. Разметка тут СТАТИЧЕСКАЯ: оба блока
+  (#guest и #profile) уже написаны в HTML, а auth.js просто включает
+  им атрибут hidden. Так сделано специально:
+
+    · текст форм виден в исходнике и правится без знания JS;
+    · если JavaScript выключен или упал, человек хотя бы увидит,
+      что на странице есть вход и регистрация, а не белый экран;
+    · рисовать формы кодом пришлось бы в том случае, если бы их
+      содержимое зависело от данных. Здесь данных нет.
+
+  А вот содержимое #profile-body РИСУЕТСЯ кодом — там данные
+  (ник, дата, счётчики), которые известны только в рантайме.
+-->
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Кабинет — Дотерская харчевня</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- правила сайта и плашка про хранилище: см. notice.js -->
+  <link rel="stylesheet" href="notice.css">
+</head>
+
+<body>
+
+  <div class="page-nav">
+    <a class="back-link" href="index.html">← На главную</a>
+  </div>
+
+  <!-- Сюда auth.js вставляет панельку «кто я». Пустой div на всех
+       страницах сайта одинаковый: рисует его один и тот же код. -->
+  <div id="account-bar"></div>
+
+  <main class="page" id="account-page">
+
+    <h1 class="page-title">👤 Кабинет</h1>
+
+    <!-- Общая служебная строка ОБА блока под заголовком. Нужна именно
+         снаружи: сообщать «аккаунт удалён» внутри #profile бессмысленно —
+         этот блок в тот момент уже скрыт, и человек не узнает, что
+         действие сработало. -->
+    <p class="form-msg" id="page-msg" role="status"></p>
+
+    <!-- ===== БЛОК ДЛЯ ТЕХ, КТО НЕ ВОШЁЛ ===== -->
+    <section id="guest" class="guest">
+
+      <p class="guest-note">
+        Аккаунт нужен, чтобы оставлять отзывы и добавлять свои рецепты.
+        Читать сайт можно и без него.
+      </p>
+
+      <div class="forms">
+
+        <!-- ===== ВХОД =====
+             novalidate — «не показывай браузерные подсказки», у нас
+             свои сообщения в #login-msg: они на русском и объясняют,
+             что именно не так.
+
+             autocomplete="username" / "current-password" — подсказка
+             браузеру и менеджеру паролей подставить сохранённое.
+             Работает только на полях с такими name, поэтому name тут
+             настоящие, а не для красоты. -->
+        <form class="form" id="login-form" novalidate>
+          <h2 class="form-title" id="login">Войти</h2>
+
+          <label class="field">
+            <span class="field-name">Логин</span>
+            <input class="field-input" id="login-name" name="username"
+                   type="text" autocomplete="username" required
+                   placeholder="например, dot_babarika">
+          </label>
+
+          <label class="field">
+            <span class="field-name">Пароль</span>
+            <input class="field-input" id="login-pass" name="current-password"
+                   type="password" autocomplete="current-password" required
+                   placeholder="шесть символов и больше">
+          </label>
+
+          <!-- Сюда auth.js кладёт текст ошибки. Пустой абзац нужен,
+               чтобы не было «прыжка» вёрстки, когда текст появится. -->
+          <p class="form-msg" id="login-msg" role="alert"></p>
+
+          <button class="btn btn-submit" type="submit">Войти</button>
+        </form>
+
+        <!-- ===== РЕГИСТРАЦИЯ ===== -->
+        <form class="form" id="register-form" novalidate>
+          <h2 class="form-title" id="register">Регистрация</h2>
+
+          <label class="field">
+            <span class="field-name">Логин</span>
+            <input class="field-input" id="reg-login" name="username"
+                   type="text" autocomplete="username" required
+                   placeholder="латиница, цифры, - и _">
+            <span class="field-hint">Техническое имя. По нему вход, его никто
+              не увидит. Минимум 3 символа.</span>
+          </label>
+
+          <label class="field">
+            <span class="field-name">Ник</span>
+            <input class="field-input" id="reg-nick" name="nickname"
+                   type="text" autocomplete="nickname" required
+                   placeholder="как тебя подписывать в отзывах">
+            <span class="field-hint">Виден всем. Любые символы, до 24.</span>
+          </label>
+
+          <label class="field">
+            <span class="field-name">Пароль</span>
+            <input class="field-input" id="reg-pass" name="new-password"
+                   type="password" autocomplete="new-password" required
+                   placeholder="минимум 6 символов">
+          </label>
+
+          <label class="field">
+            <span class="field-name">Пароль ещё раз</span>
+            <input class="field-input" id="reg-pass2" name="new-password2"
+                   type="password" autocomplete="new-password" required
+                   placeholder="на случай опечатки в первом поле">
+          </label>
+
+          <p class="form-msg" id="reg-msg" role="alert"></p>
+
+          <button class="btn btn-submit" type="submit">Создать аккаунт</button>
+
+          <!-- Честное предупреждение вместо обещаний «мы защитим твои
+               данные». Сервера нет — врать посетителю хуже, чем сказать
+               правду про то, как всё устроено. -->
+          <p class="form-note">
+            ⚠️ Сервера у сайта нет: аккаунт и пароль сохраняются в браузере
+            этого компьютера и никуда не уходят. Пароль проверяется тоже в
+            браузере, поэтому не бери тот, что вводишь на почте или в банке.
+          </p>
+        </form>
+
+      </div>
+    </section>
+
+    <!-- ===== БЛОК ДЛЯ ВОШЕДШЕГО ===== -->
+    <section id="profile" class="profile" hidden>
+
+      <h2 class="form-title">Профиль</h2>
+
+      <!-- Кто я, сколько у меня добра, кнопки. Наполняет auth.js. -->
+      <div id="profile-body"></div>
+
+      <h3 class="section-subtitle">Мои рецепты</h3>
+      <div id="profile-recipes" class="mine-list"></div>
+
+      <h3 class="section-subtitle">Мои отзывы</h3>
+      <div id="profile-reviews" class="mine-list"></div>
+
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <p>© 2026 Дотерская харчевня</p>
+  </footer>
+
+  <!-- ===== ПОРЯДОК ПОДКЛЮЧЕНИЯ ИМЕЕТ ЗНАЧЕНИЕ =====
+       defer выполняет файлы строго в этом порядке, поэтому:
+         store.js  — хранилище (никого не зовёт)
+         ui.js     — кирпичи для DOM
+         auth.js   — аккаунты, использует Store и Ui
+         reviews.js — опирается на Auth
+         recipes-user.js — опирается на Auth и Reviews
+       Переставить местами — получить «X is not defined» в консоли. -->
+  <script src="store.js" defer></script>
+  <script src="ui.js" defer></script>
+  <script src="auth.js" defer></script>
+  <script src="reviews.js" defer></script>
+  <script src="recipes-user.js" defer></script>
+
+  <!-- окно регламента и плашка про хранилище. Стоит последним:
+      на страницах корня Store к этому моменту уже подключён,
+      а в разделах его нет — тогда notice.js берёт своё
+      чтение localStorage (в нём есть своя страховка) -->
+  <script src="notice.js" defer></script>
+
+</body>
+</html>

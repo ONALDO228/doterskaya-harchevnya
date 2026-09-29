@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <!-- name=viewport: без него телефон рисует страницу шириной 980px,
+       и весь адаптивный CSS ниже не имеет смысла. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Мемасики — мемные рецепты сайта рецептов. Сложность в рангах Dota 2, фильтры по категории и MMR, возрастной замок 18+.">
+  <title>🎮 Мемасики — рецепты, которые пикают на пати</title>
+
+  <!-- Единственный файл стилей раздела. Шрифтов нет: системный стек
+       из memasiki.css. -->
+  <link rel="stylesheet" href="memasiki.css">
+  <!-- правила сайта и плашка про хранилище: см. notice.js -->
+  <link rel="stylesheet" href="../notice.css">
+
+  <!-- defer: файл скачивается сразу, а выполняется после того, как
+       браузер построил страницу. Данные подключены ПЕРЕД app.js —
+      app.js читает массив memeRecipes, которого без data.js ещё нет. -->
+  <script src="data.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+
+  <!-- Всё содержимое раздела рисует app.js: шапка, кнопки фильтров,
+       сетка карточек, строка «показано N из M». Здесь только пустой
+       контейнер под них — ровно то, что ищет MemasikiPage(). -->
+  <main id="memasiki"></main>
+
+  <!-- Сюда вставляется окно возраста. Отдельный контейнер, а не
+       внутрис #memasiki: MemasikiPage перерисовывает #memasiki при
+       каждом клике по фильтру, окно бы вместе с ним исчезало. -->
+  <div id="agegate-slot"></div>
+
+  <footer class="footer">
+    <div class="legend-wrap">
+      <p>16 рецептов, фильтры по MMR и категориям. Коктейли — под замком 18+.</p>
+      <div class="footer-row">
+        <a class="footer-link" href="../index.html">← На главную</a>
+        <!-- Кнопка снимает сохранённый ответ про возраст: страница
+             спросит заново. Нужна, потому что localStorage сам не чистится. -->
+        <button class="footer-link" type="button" id="age-reset">сменить возраст</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- окно регламента и плашка про хранилище. Стоит последним:
+      на страницах корня Store к этому моменту уже подключён,
+      а в разделах его нет — тогда notice.js берёт своё
+      чтение localStorage (в нём есть своя страховка) -->
+  <script src="../notice.js" defer></script>
+
+</body>
+</html>

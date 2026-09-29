@@ -7,15 +7,19 @@
 
    Как файл попадает на страницу (см. index.html):
      <script src="script.js" defer></script>
-   defer = "дождись, пока браузер построит страницу, и только потом
-   выполняй меня". Без defer скрипт отрабатывает ДО того, как тег
-   кнопки вообще существует, querySelector возвращает null, и всё
-   падает с "Cannot read properties of null". Это ошибка №1 у всех,
-   кто начинает писать JS.
+    defer = "дождись, пока браузер построит страницу, и только потом
+    выполняй меня". Без defer скрипт отрабатывает ДО того, как тег
+    кнопки вообще существует, querySelector возвращает null, и всё
+    падает с "Cannot read properties of null". Это ошибка №1 у всех,
+    кто начинает писать JS.
+
+   ПОРЯДОК НА СТРАНИЦЕ: script.js подключён ПОСЛЕДНИМ, потому что
+   смотрит в UserRecipes (файл recipes-user.js) — рецепты посетителей
+   для случайного выбора.
    ========================================================================== */
 
 
-/* СПИСОК РЕЦЕПТОВ.
+/* СПИСОК РЕЦЕПТОВ САЙТА — те, что вписаны автором.
    Массив — это пронумерованный список значений внутри квадратных
    скобок. Нумерация starts with 0: recipes[0] — первый элемент.
 
@@ -32,10 +36,12 @@
    несуществующую страницу.
    Тут список один: добавила рецепт = добавила одну строчку сюда. */
 var recipes = [
-  { file: 'recipe.html',     name: 'Борщ мамкин' },
+  { file: 'recipe.html',     name: 'Борщ твоей мамки' },
   { file: 'bliny.html',      name: 'Блины мини пеки' },
   { file: 'salat.html',      name: 'Цезарь «Соло-рейндж»' },
-  { file: 'carbonara.html',  name: 'Карбонара «Рапира»' }
+  { file: 'carbonara.html',  name: 'Карбонара «Рапира»' },
+  { file: 'pampasiki/pampe.html', name: 'Пампасики: 10 рецептов' },
+  { file: 'memasiki/index.html',  name: 'Раздел «Мемасики»' }
 ];
 
 
@@ -56,8 +62,28 @@ var recipes = [
    undefined (reading 'file')". Классическая ошибка на границе
    диапазона. */
 function pickRecipe() {
-  var index = Math.floor(Math.random() * recipes.length);
-  return recipes[index];
+  var pool = allRecipes();
+  var index = Math.floor(Math.random() * pool.length);
+  return pool[index];
+}
+
+
+/* ПОЛНЫЙ СПИСОК ДЛЯ ВЫБОРА = СВОИ + НАРОДНЫЕ.
+   recipes-user.js отдаёт рецепты посетителей уже в нужном формате
+   { file, name }, поэтому здесь только склеивание массивов.
+
+   concat НЕ меняет исходные массивы, а возвращает новый — важно,
+   иначе countRecipes() считал бы удвоенное количество после первого
+   же вызова.
+
+   Проверка typeof UserRecipes нужна, потому что файл может быть не
+   подключён (страница без аккаунтов, или скрипт подключили один).
+   Без неё страница падала бы с "UserRecipes is not defined". */
+function allRecipes() {
+  if (typeof UserRecipes !== 'undefined' && UserRecipes.forRandom) {
+    return recipes.concat(UserRecipes.forRandom());
+  }
+  return recipes;
 }
 
 
@@ -100,14 +126,28 @@ if (randomBtn) {
 
    Зачем не вписать цифру руками: впишешь «4», через неделю добавишь
    рецепт, про цифру забудешь — и сайт начнёт врать. Тут число
-   берётся из recipes.length, то есть из того же списка, по которому
-   кнопка реально работает. Врать он не может физически.
+   берётся из allRecipes().length, то есть из того же списка, по
+   которому кнопка реально работает. Врать он не может физически.
 
    textContent = «положи внутрь элемента такой-то текст».
    length у массива — количество элементов, у строки — количество
    символов. Это свойство, а не метод: скобки после него не пишут. */
-var countEl = document.querySelector('#recipes-count');
-
-if (countEl) {
-  countEl.textContent = recipes.length;
+function renderCount() {
+  var countEl = document.querySelector('#recipes-count');
+  if (countEl) {
+    countEl.textContent = allRecipes().length;
+  }
 }
+
+renderCount();
+
+
+/* ПЕРЕРИСОВАТЬ ЧИСЛО ПОСЛЕ ТОГО, КАК КТО-ТО ДОБАВИЛ РЕЦЕПТ.
+   Без этой строки счётчик показал бы «6», человек добавил бы свой
+   рецепт, и до перезагрузки страницы цифра врала бы.
+   Auth.subscribe — то же, чем пользуются отзывы: не лезть внутрь
+   auth.js, а попросить позвать себя, когда что-то изменится. */
+if (typeof Auth !== 'undefined' && Auth.subscribe) {
+  Auth.subscribe(renderCount);
+}
+

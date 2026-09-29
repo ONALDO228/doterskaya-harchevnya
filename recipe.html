@@ -9,28 +9,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Борщ украинский — Дотерский харч</title>
+  <title>Борщ твоей мамки — Дотерская харчевня</title>
   <link rel="stylesheet" href="style.css">
+  <!-- правила сайта и плашка про хранилище: см. notice.js -->
+  <link rel="stylesheet" href="notice.css">
 </head>
 
-<body>
+<body data-recipe-id="borshch" data-recipe-title="Борщ твоей мамки">
+  <!-- data-recipe-id — КЛЮЧ, по которому отзывы привязываются к
+       рецепту. reviews.js читает его (document.body.dataset.recipeId)
+       и пишет отзывы в свою базу с этим значением. Без атрибута виджет
+       просто не появится: он не понимает, о чём страница.
+       Значение — короткое латинское имя, а не название: оно попадает в
+       адрес и в данные, и менять его потом больно. -->
 
   <!-- Кнопка "назад" на главную. href="index.html" = перейти в файл index.html -->
   <div class="page-nav">
     <a class="back-link" href="index.html">← На главную</a>
   </div>
 
+  <!-- Панелька аккаунта: кто вошёл, вход/регистрация для остальных -->
+  <div id="account-bar"></div>
+
   <main class="recipe">
 
     <!-- ===== ЗАГОЛОВОК РЕЦЕПТА ===== -->
     <header class="recipe-header">
-      <h1 class="recipe-title">Борщ мамкин</h1>
+      <h1 class="recipe-title">Борщ твоей мамки</h1>
       <p class="recipe-meta">⏱ 1 час 30 мин &nbsp;•&nbsp; 👥 6 порций &nbsp;•&nbsp; 🥘 средняя сложность</p>
     </header>
 
-    <!-- ===== БОЛЬШОЕ ФОТО ===== -->
-    <div class="recipe-photo photo-dire">
-      <img class="recipe-img"
+    <!-- ===== БОЛЬШОЕ ФОТО =====
+         Тот же приём, что в карточках главной: эмодзи лежит ПОД
+         картинкой. Файл img/borshch.jpg — ОДИН и тот же, что и на
+         карточке №1: одно блюдо = один файл, второй копии не нужно. -->
+    <div class="recipe-photo photo-dire">🍲
+      <img class="recipe-img fill"
            src="img/borshch.jpg"
            alt="Борщ твоей мамки"
            title="Он знает, где ты живёшь">
@@ -84,9 +98,31 @@
     </div>
   </main>
 
+  <!-- ===== ОТЗЫВЫ =====
+       Виджет рисует reviews.js: средний рейтинг, форма (или просьба
+       войти для гостя) и список. Пустой контейнер, а не готовая
+       разметка, потому что содержимое зависит от того, вошёл ли
+       человек, и от того, сколько отзывов уже есть. -->
+  <div class="page">
+    <section id="reviews"></section>
+  </div>
+
   <footer class="footer">
-    <p>© 2026 дотерский харч</p>
+    <p>© 2026 Дотерская харчевня</p>
   </footer>
+
+  <!-- Порядок важен: store → ui → auth → reviews. Каждый следующий
+       пользуется предыдущими. -->
+  <script src="store.js" defer></script>
+  <script src="ui.js" defer></script>
+  <script src="auth.js" defer></script>
+  <script src="reviews.js" defer></script>
+
+  <!-- окно регламента и плашка про хранилище. Стоит последним:
+      на страницах корня Store к этому моменту уже подключён,
+      а в разделах его нет — тогда notice.js берёт своё
+      чтение localStorage (в нём есть своя страховка) -->
+  <script src="notice.js" defer></script>
 
 </body>
 </html>

@@ -11,15 +11,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Блины мини пеки — Дотерский харч</title>
+  <title>Блины мини пеки — Дотерская харчевня</title>
   <link rel="stylesheet" href="style.css">
+  <!-- правила сайта и плашка про хранилище: см. notice.js -->
+  <link rel="stylesheet" href="notice.css">
 </head>
 
-<body>
+<body data-recipe-id="bliny" data-recipe-title="Блины мини пеки">
+  <!-- data-recipe-id говорит reviews.js, к какому рецепту писать
+       отзывы. У каждой страницы рецептов своё значение — файл
+       reviews.js при этом один на всех. -->
 
   <div class="page-nav">
     <a class="back-link" href="index.html">← На главную</a>
   </div>
+
+  <!-- Панелька аккаунта (рисует auth.js) -->
+  <div id="account-bar"></div>
 
   <main class="recipe">
 
@@ -28,13 +36,13 @@
       <p class="recipe-meta">⏱ 40 мин &nbsp;•&nbsp; 👥 12 штук &nbsp;•&nbsp; 🥗 легко</p>
     </header>
 
-    <!-- ФОТО. Класс fill растягивает картинку на весь блок:
-         заполняет всю ширину, лишнее по краям обрезается.
-         Без fill квадратная картинка висела бы маленьким
-         квадратиком посреди широкой плашки. -->
-    <div class="recipe-photo photo-yellow">
+    <!-- ФОТО. Тот же файл, что в карточке главной (img/bliny.jpg) —
+         генерировать второй кадр не нужно. Класс fill растягивает
+         картинку на весь блок: заполняет ширину, лишнее по краям
+         обрезается. -->
+    <div class="recipe-photo photo-yellow">🥞
       <img class="recipe-img fill"
-           src="img/bliny-2.jpg"
+           src="img/bliny.jpg"
            alt="Мини пеки с тортом"
            title="PANCAKES!">
     </div>
@@ -79,9 +87,25 @@
     </div>
   </main>
 
+  <!-- Отзывы и рейтинг: содержимое создаёт reviews.js -->
+  <div class="page">
+    <section id="reviews"></section>
+  </div>
+
   <footer class="footer">
-    <p>© 2026 Дотерский харч</p>
+    <p>© 2026 Дотерская харчевня</p>
   </footer>
+
+  <script src="store.js" defer></script>
+  <script src="ui.js" defer></script>
+  <script src="auth.js" defer></script>
+  <script src="reviews.js" defer></script>
+
+  <!-- окно регламента и плашка про хранилище. Стоит последним:
+      на страницах корня Store к этому моменту уже подключён,
+      а в разделах его нет — тогда notice.js берёт своё
+      чтение localStorage (в нём есть своя страховка) -->
+  <script src="notice.js" defer></script>
 
 </body>
 </html>

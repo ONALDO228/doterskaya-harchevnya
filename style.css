@@ -607,3 +607,790 @@ body {
   height: 100%;
   object-fit: contain;
 }
+
+
+/* ==========================================================================
+   8. СООБЩЕСТВО: ПАНЕЛЬКА АККАУНТА, ФОРМЫ, ОТЗЫВЫ, НАРОДНАЯ БАЗА
+
+   Всё, что появилось вместе с аккаунтами. Цвета и скругления НЕ
+   переписываются числами, а берутся из переменных в :root — иначе
+   новый блок выглядел бы чужим после смены темы.
+
+   ВАЖНО ПО ПОРЯДКУ. Этот блок стоит ПОСЛЕ раздела адаптации (7),
+   поэтому свои mobile-правила он пишет собственным @media-блоком в
+   самом низу файла. Глобальный @media сверху его не переопределит:
+   побеждает то, что написано ниже.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   8.1. КОНТЕЙНЕР НОВЫХ СТРАНИЦ
+   -------------------------------------------------------------------------- */
+
+/* .page — то же, что .recipes и .recipe: ограничить ширину и
+   отцентровать. Новый класс вместо переиспользования старого, потому
+   что у главной внутри карточки, а у кабинета формы, и нижние отступы
+   нужны разные. */
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px 60px;
+}
+
+.page-title {
+  font-size: 32px;
+  margin: 0 0 10px;
+}
+
+.page-lead {
+  margin: 0 0 24px;
+  color: var(--text-soft);
+  max-width: 700px;
+}
+
+.section-subtitle {
+  font-size: 20px;
+  margin: 28px 0 10px;
+}
+
+/* Сообщение «тут пусто». Обычный текст, а не плашка: привлекать к
+   пустоте внимание рамкой — кричать об отсутствии контента. */
+.empty-note {
+  color: var(--text-soft);
+  margin: 0 0 16px;
+}
+
+.empty-state {
+  padding: 40px 0;
+}
+
+/* --------------------------------------------------------------------------
+   8.2. ПАНЕЛЬКА АККАУНТА
+   -------------------------------------------------------------------------- */
+
+/* Ограничение ширины то же, что у контента, иначе на широком экране
+   панелька разъедется по краям, а ссылки уедут в нечитаемую даль. */
+#account-bar {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 16px 20px 0;
+}
+
+.acct {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+
+  padding: 12px 14px;
+  background: var(--card-bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+/* Кто я — выделяем, остальное тише. */
+.acct-hi {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-right: auto;
+  /* Забрать всё свободное место — и ссылки прижмутся к правому краю.
+     Тот же приём, что с margin-top: auto у кнопки в карточке. */
+}
+
+.acct-nick {
+  font-weight: 700;
+}
+
+.acct-note {
+  font-size: 14px;
+  color: var(--text-soft);
+}
+
+/* Ссылка и кнопка выглядят одинаково, поэтому ОДИН класс.
+   Разница между ними в смысле (ссылка ведёт, кнопка делает), а не
+   в цвете. */
+.acct-btn {
+  display: inline-block;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background .18s ease, border-color .18s ease;
+}
+
+.acct-btn:hover {
+  background: var(--card-bg);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.acct-btn:focus-visible {
+  outline: 3px solid var(--accent-dark);
+  outline-offset: 2px;
+}
+
+/* Выход — не удаление, поэтому не красный, а просто приглушённый. */
+.acct-btn-out {
+  color: var(--text-soft);
+}
+
+/* --------------------------------------------------------------------------
+   8.3. ФОРМЫ
+   --------------------------------------------------------------------------
+   Разметка формы всегда одна и та же:
+     <form class="form">
+       <label class="field">
+         <span class="field-name">Подпись</span>
+         <input class="field-input">
+         <span class="field-hint">подсказка</span>
+       </label>
+     </form>
+   label ОБЪЕДИНЯЕТ подпись и поле: клик по слову «Логин» ставит
+   курсор в поле, а программа чтения экрана озвучит эту подпись.
+   Без label поле остаётся безымянным — формально это уже ошибка
+   доступности. */
+
+.form {
+  background: var(--card-bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin: 0 0 24px;
+}
+
+.form-wide {
+  max-width: 760px;
+}
+
+.form-title {
+  font-size: 22px;
+  margin: 0 0 16px;
+}
+
+.field {
+  display: block;
+  margin: 0 0 16px;
+}
+
+.field-name {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+/* НАСЛЕДОВАНИЕ ШРИФТА — мелочь, которая портит всё.
+   У input/textarea/select браузерный шрифт СВОЙ (обычно мелкий
+   моноширинный-ish), он не берётся от body. Без font: inherit поля
+   выглядят вырезанными из другого сайта. */
+.field-input {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  font: inherit;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+
+  /* Для textarea: запретить тянуть за угол. Пользователь растянет
+     поле на полстраницы, и сетка поедет. */
+  resize: vertical;
+}
+
+/* :focus вместо :hover — на поле наезжают мышкой редко, а вот
+   кликают часто. Рамка при фокусе обязательна: без неё не видно, в
+   какое поле сейчас пишется. */
+.field-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(183, 1, 1, .12);
+}
+
+.field-hint {
+  display: block;
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--text-soft);
+}
+
+/* Два-три коротких поля в ряд. auto-fit + minmax: сколько колонок
+   влезет по 200px — столько и будет, отдельный media-запрос не нужен. */
+.field-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0 16px;
+}
+
+/* --------------------------------------------------------------------------
+   СООБЩЕНИЕ ФОРМЫ
+   -------------------------------------------------------------------------- */
+
+.form-msg {
+  margin: 0 0 14px;
+  font-size: 15px;
+  min-height: 22px;
+  /* Высота rezervirovana заранее: сообщение появляется не в пустоте,
+     и форма под ним не подскакивает на пару строк. */
+}
+
+.form-msg-error {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.form-msg-ok {
+  color: #2f6b3a;
+  font-weight: 600;
+}
+
+.form-note {
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  font-size: 14px;
+  color: var(--text-soft);
+  background: var(--tip-bg);
+  border-left: 4px solid var(--accent);
+  border-radius: 8px;
+}
+
+.form-who {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: var(--text-soft);
+}
+
+/* --------------------------------------------------------------------------
+   КНОПКИ: ОСНОВНАЯ, ВТОРОСТЕПЕННАЯ, ОПАСНАЯ
+   --------------------------------------------------------------------------
+   .btn уже описана выше (в разделе карточек) — здесь только
+   переопределяющие модификаторы. Они стоят НИЖЕ .btn, поэтому и
+   перебивают её фон: при равной важности селекторов побеждает то
+   правило, что записано позже. */
+
+.btn-submit {
+  font-family: inherit;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  margin-top: 0;
+  /* .btn прижимает себя к низу карточки через margin-top: auto.
+     В форме такой прижим не нужен и ломает интервалы. */
+}
+
+.btn-ghost {
+  background: var(--card-bg);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  font-family: inherit;
+  cursor: pointer;
+  margin-top: 0;
+}
+
+.btn-ghost:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* «Удалить» всегда краснее остальных: цвет — единственное, что
+   отличает необратимую кнопку от обычной на вид. */
+.btn-danger {
+  background: var(--accent-dark);
+  font-family: inherit;
+  cursor: pointer;
+  margin-top: 0;
+}
+
+.btn-danger:hover {
+  background: #5c0e0a;
+}
+
+/* --------------------------------------------------------------------------
+   8.4. ЭКРАНЫ-ЗАГЛУШКИ («войдите, чтобы…»)
+   -------------------------------------------------------------------------- */
+
+.gate,
+.guest-note {
+  max-width: 700px;
+}
+
+.gate {
+  padding: 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.gate-text {
+  margin: 0 0 16px;
+}
+
+/* --------------------------------------------------------------------------
+   8.5. ПРОФИЛЬ И «МОИ ЗАПИСИ»
+   -------------------------------------------------------------------------- */
+
+/* Две формы входа/регистрации рядом. auto-fit: не влезли —
+   складываются в столбик без отдельного media-запроса. */
+.forms {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  align-items: start;
+}
+
+.guest-note {
+  margin: 0 0 24px;
+  color: var(--text-soft);
+}
+
+.profile-info {
+  background: var(--card-bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+}
+
+/* Строка «ключ — значение». Грид с двумя колонками, а не таблица:
+   таблица для двух колонок — оверкилл, и её нельзя сделать
+   адаптивной одной строкой. */
+.profile-row {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.profile-row:last-child {
+  border-bottom: none;
+}
+
+.profile-key {
+  color: var(--text-soft);
+  font-size: 14px;
+}
+
+.profile-val {
+  font-weight: 600;
+  word-break: break-word;
+  /* Длинный ник без переноса распахнул бы блок на ширину экрана:
+     break-word рвёт его по буквам внутри колонки. */
+}
+
+.profile-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 18px 0;
+}
+
+.profile-danger {
+  margin-top: 24px;
+  padding: 16px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+}
+
+.profile-danger-note {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: var(--text-soft);
+}
+
+.mine-list {
+  margin-bottom: 24px;
+}
+
+.mine-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.mine-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.mine-link:hover {
+  text-decoration: underline;
+}
+
+.mine-date {
+  font-size: 13px;
+  color: var(--text-soft);
+  margin-left: auto;
+}
+
+/* --------------------------------------------------------------------------
+   8.6. ОТЗЫВЫ
+   -------------------------------------------------------------------------- */
+
+.reviews {
+  background: var(--card-bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-top: 32px;
+}
+
+.reviews-title {
+  font-size: 24px;
+  margin: 0 0 14px;
+}
+
+.reviews-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 18px;
+}
+
+.reviews-avg {
+  font-weight: 700;
+}
+
+.reviews-count {
+  font-size: 14px;
+  color: var(--text-soft);
+}
+
+/* ЗВЁЗДЫ. Символ ★/☆ inherits цвет и размер — иконки не нужны. */
+.stars {
+  color: #e8a20c;
+  font-size: 20px;
+  letter-spacing: 2px;
+  /* Буква-звезда стоит вплотную к соседке; без letter-spacing
+     «★★★★★» читается как одна длинная каляка. */
+}
+
+/* --- ВЫБОР ОЦЕНКИ --- */
+.star-input {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 16px;
+}
+
+/* Кнопки, а не radio: radio надо стилизовать через костыли с
+   appearance:none и скрытым input, а поведение нужно простое —
+   «нажал на четвёртую, значит оценка 4».
+   aria-label на каждой объясняет кнопку программе чтения экрана. */
+.star-btn {
+  font: inherit;
+  font-size: 28px;
+  line-height: 1;
+  padding: 2px 4px;
+  background: none;
+  border: none;
+  color: var(--line);
+  cursor: pointer;
+  transition: color .12s ease, transform .12s ease;
+}
+
+.star-btn:hover {
+  transform: scale(1.15);
+}
+
+.star-btn:focus-visible {
+  outline: 3px solid var(--accent-dark);
+  outline-offset: 2px;
+}
+
+.star-on {
+  color: #e8a20c;
+}
+
+.star-caption {
+  font-size: 14px;
+  color: var(--text-soft);
+  margin-left: 6px;
+}
+
+/* Блок формы отзыва отделён от списка: визуально это «место ввода»,
+   а не ещё один отзыв. Фон чуть светлее основной карточки, чтобы не
+   спорить с .review. */
+.review-form-box {
+  margin: 0 0 22px;
+  padding: 16px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+/* --- СПИСОК --- */
+.review-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.review {
+  padding: 14px 16px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.review-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.review-author {
+  font-weight: 700;
+}
+
+.review-date {
+  font-size: 13px;
+  color: var(--text-soft);
+  margin-left: auto;
+}
+
+.review-text {
+  margin: 0;
+  white-space: pre-wrap;
+  /* ВАЖНО ДЛЯ ПОЛЕЗНОСТИ. Человек писал отзыв с абзацами, то есть
+     символами \n. По умолчанию HTML схлопывает все переносы в один
+     пробел, и текст слипается в кашу. pre-wrap возвращает абзацы
+     обратно, но при этом (в отличие от pre) разрешает перенос длинных
+     строк. innerHTML для этого не нужен. */
+}
+
+.review-empty,
+.review-guest {
+  color: var(--text-soft);
+  margin: 0 0 12px;
+}
+
+.review-del {
+  margin-top: 10px;
+  padding: 4px 10px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--accent);
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.review-del:hover {
+  border-color: var(--accent);
+}
+
+/* --------------------------------------------------------------------------
+   8.7. НАРОДНАЯ БАЗА
+   -------------------------------------------------------------------------- */
+
+.community-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0 0 28px;
+}
+
+.community-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.community-count {
+  margin: 0;
+  font-size: 15px;
+  color: var(--text-soft);
+  margin-right: auto;
+}
+
+.community-search {
+  width: auto;
+  min-width: 240px;
+}
+
+/* Кнопка-фильтр «только мои». chip = маленькая, округлая, без фона;
+   chip-on = нажатая. Тот же приём, что в «Мемасиках». */
+.chip {
+  padding: 7px 14px;
+  font: inherit;
+  font-size: 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  /* 999px «больше, чем высота» — скругление превращается в таблетку
+     при любой высоте, править значение под каждый размер не надо. */
+  background: var(--card-bg);
+  color: var(--text);
+  cursor: pointer;
+  transition: background .18s ease, color .18s ease;
+}
+
+.chip-on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* Подпись «от Nик · 3 дня назад» под описанием карточки. */
+.card-author {
+  margin: 0 0 14px;
+  font-size: 13px;
+  color: var(--text-soft);
+}
+
+/* Авторство народного рецепта на самой странице. */
+.recipe-author {
+  margin: 8px 0 0;
+  font-size: 14px;
+  color: var(--text-soft);
+}
+
+.recipe-intro {
+  margin: 12px 0 0;
+  max-width: 760px;
+}
+
+.recipe-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+/* --------------------------------------------------------------------------
+   8.8. АДАПТАЦИЯ НОВЫХ БЛОКОВ
+   --------------------------------------------------------------------------
+   Отдельный блок в самом конце файла — не дубль раздела 7, а
+   продолжение: то, что написано здесь, перебивает всё выше, включая
+   правила 8.x. Свой @media нужен потому, что старый блок стоит ВЫШЕ
+   новых правил и просто не смог бы их переопределить. */
+
+@media (max-width: 760px) {
+
+  .page-title {
+    font-size: 26px;
+  }
+
+  /* Панелька: ссылка «Добавить рецепт» в 14px пальцем не попадёшь —
+     раздуваем зону нажатия, как когда-то с «На главную». */
+  .acct-btn {
+    padding: 10px 14px;
+    font-size: 15px;
+  }
+
+  /* Кто я — на свою строку, ссылки ниже. В одну строку на телефоне
+     не помещается даже «Ник + две ссылки». */
+  .acct-hi {
+    width: 100%;
+    margin-right: 0;
+  }
+
+  .form {
+    padding: 18px;
+  }
+
+  /* Дата отзыва перестаёт прижиматься вправо и встаёт под автора:
+     между именем и датой остаётся 30 пикселей, и текст прыгает. */
+  .review-date,
+  .mine-date {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .profile-row {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .star-btn {
+    font-size: 34px;
+    /* Палец шрифта крупнее — меньше шансов промахнуться по звезде. */
+    padding: 6px 8px;
+  }
+
+  .community-search {
+    width: 100%;
+  }
+}
+
+
+/* ==========================================================================
+   9. СЛОТ ПОД ФОТО (эмодзи + картинка сверху)
+
+   Зачем этот блок. Картинки можно будет просто кинуть в папку img/ —
+   и они появятся сами, ничего в CSS менять не придётся. Разметка одна
+   и для карточки, и для большой фотографии:
+
+     <div class="card-photo photo-orange">🍝
+       <img src="img/carbonara.jpg" alt="Карбонара">
+     </div>
+
+   Как это работает:
+     1. div = САМ слот: у него фиксированная высота и градиент
+        (photo-orange), внутри написан эмодзи;
+     2. img лежит ПОВЕРХ слота: position:absolute + inset:0 растягивают
+        его на всю площадь, object-fit:cover обрезает без искажения;
+     3. если файла нет, Ui.fixBrokenPhotos (ui.js) убирает img — а под
+        ним уже лежит эмодзи. Ни серых значков «не загрузилось», ни
+        прыжка вёрстки: высота у слота была и осталась.
+
+   ПОЧЕМУ СЕЛЕКТОРЫ ТАКИЕ ДЛИННЫЕ.
+   .card-photo > img — это класс + тег (вес 0,1,1), он важнее просто
+   .recipe-img (0,1,0). А .recipe-photo > img.fit-full — два класса
+   (0,2,1), важнее обоих. Поэтому contain работает, и порядок правил в
+   файле больше не надо выверять руками.
+   ========================================================================== */
+
+.card-photo,
+.recipe-photo {
+  position: relative;
+  /* Точка отсчёта для абсолютной картинки. Без неё inset:0 отсчитался
+     бы от другого родителя, и картинка уехала бы из своей плашки. */
+}
+
+.card-photo > img,
+.recipe-photo > img {
+  position: absolute;
+  inset: 0;
+  /* top/right/bottom/left = 0 → картинка прижата ко всем четырём
+     сторонам, то есть занимает слот целиком. */
+
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+  /* Скругление забираем у слота, иначе угол картинки останется острым
+     поверх круглой карточки. */
+}
+
+/* ПОКАЗАТЬ ФОТО ЦЕЛИКОМ вместо обрезки (страница цезаря).
+   contain вписывает картинку целиком; пустые поля по бокам закрывает
+   градиент плашки — это выглядит как рамка, а не как дырка. */
+.recipe-photo > img.fit-full {
+  object-fit: contain;
+}
+
+/* ОБРЕЗАТЬ С ВЕРХА.
+   Класс стоит НА САМОЙ КАРТИНКЕ, а не на слоте: он описывает, как
+   вести себя именно img. Нужно для высокой картинки блинов — без него
+   от вертикального фото остался бы центр: «торс робота без блинов». */
+.card-photo > img.photo-top {
+  object-position: top;
+}
