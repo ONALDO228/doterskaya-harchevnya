@@ -13,6 +13,10 @@
   <link rel="stylesheet" href="style.css">
   <!-- правила сайта и плашка про хранилище: см. notice.js -->
   <link rel="stylesheet" href="notice.css">
+  <!-- наряд харчевни: кованые шапки, бейджи, живой поиск.
+       Ставится ПОСЛЕ notice.css — перекрашивает готовые блоки,
+       а не заменяет их. Без него страница выглядит как раньше -->
+  <link rel="stylesheet" href="tavern.css">
 </head>
 
 <body data-recipe-id="salat" data-recipe-title="Цезарь «Соло-рейндж»">
@@ -104,6 +108,11 @@
       а в разделах его нет — тогда notice.js берёт своё
       чтение localStorage (в нём есть своя страховка) -->
   <script src="notice.js" defer></script>
+
+  <!-- наряд харчевни: кованые шапки, бейджи, живой поиск. Ставится
+      последним — обходит уже готовые кнопки и формы, своих полей
+      не заводит и данные не трогает -->
+  <script src="decor.js" defer></script>
 
 </body>
 </html>

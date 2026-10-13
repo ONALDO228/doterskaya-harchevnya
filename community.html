@@ -20,6 +20,9 @@
   <link rel="stylesheet" href="style.css">
   <!-- правила сайта и плашка про хранилище: см. notice.js -->
   <link rel="stylesheet" href="notice.css">
+  <!-- наряд харчевни: кованая шапка, пергамент, живые карточки.
+      Ставится последним — переопределяет style.css и notice.css -->
+  <link rel="stylesheet" href="tavern.css">
 </head>
 
 <body>
@@ -63,6 +66,11 @@
       а в разделах его нет — тогда notice.js берёт своё
       чтение localStorage (в нём есть своя страховка) -->
   <script src="notice.js" defer></script>
+
+  <!-- наряд харчевни: кованая шапка, бейджи, живой поиск. Ставится
+      последним — обходит уже готовые кнопки и формы, своих полей
+      не заводит и данные не трогает -->
+  <script src="decor.js" defer></script>
 
 </body>
 </html>

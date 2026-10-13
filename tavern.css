@@ -1,0 +1,1574 @@
+/* ==========================================================================
+   tavern.css — АТМОСФЕРА ТАВЕРНЫ
+   Единая визуальная система: орнамент, свет, движение, иконки.
+
+   ЗАЧЕМ ОТДЕЛЬНЫЙ ФАЙЛ.
+   У сайта три темы: светлая (style.css), светлая для «Пампасиков»
+   (pampe-style.css) и тёмная для «Мемасиков» (memasiki.css). Держать
+   «атмосферу» в каждом из трёх файлов — значит трижды править один и
+   тот же приём и однажды получить три разных сайта.
+
+   Здесь живёт то, что ПОВТОРЯЕТСЯ везде: золотой орнамент, тёплый свет,
+   анимации, иконки, появление при прокрутке. Собственных цветов файл
+   почти не задаёт — он выводит их из переменных темы (--accent, --line,
+   --card-bg...), которые объявляет файл страницы. Отсюда префикс
+   --tavern-* и var(...) внутри: одно и то же правило в светлой теме
+   выглядит пергаментом, в тёмной — золотом по дубу.
+
+   ПОРЯДОК ПОДКЛЮЧЕНИЯ: последним, после style.css и notice.css, — тогда
+   его правила перебивают базовые при равной важности селектора.
+   ========================================================================== */
+
+
+/* ==========================================================================
+   1. ТОКЕНЫ АТМОСФЕРЫ
+   ========================================================================== */
+
+:root {
+  /* ШРИФТЫ.
+     Заголовки — антиква: тёплая «книжная» подача, намёк на меню таверны.
+     Основной текст остаётся гротеском: 80% современного дизайна держатся
+     именно на этом контрасте, а не на картинках. */
+  --tavern-display: "Iowan Old Style", "Palatino Linotype", Palatino,
+                    "Book Antiqua", Georgia, "Times New Roman", serif;
+
+  /* ЗОЛОТО И УГЛИ. Выводятся из темы страницы, чтобы не спорить с ней. */
+  --tavern-gold: var(--gold, #b8862f);
+  --tavern-gold-bright: #e3bd6b;
+  --tavern-gold-line: rgba(184, 134, 47, .38);
+  --tavern-gold-soft: rgba(184, 134, 47, .14);
+  --tavern-ember: var(--accent, #a01d15);
+
+  /* ПОВЕРХНОСТИ. var(--card-bg, var(--card, ...)) — потому что в светлых
+     темах панель называется --card-bg, а в тёмной --card. */
+  --tavern-card: var(--card-bg, var(--card, #fffdf9));
+  --tavern-soft: var(--text-soft, #6d635a);
+  --tavern-text: var(--text, #2b241f);
+  --tavern-line: var(--line, #e7d9c8);
+  --tavern-radius: var(--radius, 14px);
+  --tavern-radius-btn: 10px;
+
+  /* ТЕНИ. Тёплый подтон вместо нейтрального серого: тень ложится
+     «на дерево», а не «на пластик». */
+  --tavern-shadow-1: 0 1px 2px rgba(52, 30, 16, .06), 0 10px 24px rgba(52, 30, 16, .07);
+  --tavern-shadow-2: 0 2px 6px rgba(52, 30, 16, .10), 0 18px 42px rgba(52, 30, 16, .16);
+  --tavern-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, .45);
+
+  /* ДВИЖЕНИЕ. Одна кривая на весь сайт: старт быстро, остановка мягко. */
+  --tavern-ease: cubic-bezier(.22, .61, .36, 1);
+  --tavern-fast: .22s;
+  --tavern-med: .38s;
+  --tavern-slow: .7s;
+
+  /* ОРНАМЕНТЫ. SVG прямо в CSS: файл не дёргает картинку с диска,
+     орнамент масштабируется без потерь и перекрашивается одной строкой. */
+
+  /* Гербовый камень — маленький ромб. Маркеры заголовков и списков. */
+  --tavern-diamond: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M4 .8 7.2 4 4 7.2.8 4Z' fill='%23b8862f'/%3E%3C/svg%3E");
+
+  /* Линия с ромбом на конце — росчерк под крупным заголовком. */
+  --tavern-rule: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 10'%3E%3Cpath d='M17 5h120' stroke='%23b8862f' stroke-opacity='.45'/%3E%3Cpath d='M7 1.2 11.4 5 7 8.8 2.6 5Z' fill='%23b8862f' fill-opacity='.75'/%3E%3C/svg%3E");
+
+  /* Герб — щит со звездой. Медальон шапки, знак подвала, шапка окна. */
+  --tavern-crest: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d9b169' stroke-width='1.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2.6 19 5v6.2c0 4.3-2.9 7.6-7 9.2-4.1-1.6-7-4.9-7-9.2V5Z'/%3E%3Cpath d='m12 7.3 1.3 2.7 2.9.4-2.1 2.1.5 2.9-2.6-1.4-2.6 1.4.5-2.9-2.1-2.1 2.9-.4Z'/%3E%3C/svg%3E");
+
+  /* Зерно пергамента. */
+  --tavern-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.045'/%3E%3C/svg%3E");
+}
+
+
+/* ==========================================================================
+   2. БАЗА: ФОН, ВЫДЕЛЕНИЕ, ШРИФТ ЗАГОЛОВКОВ, ФОКУС
+   ========================================================================== */
+
+body {
+  -webkit-font-smoothing: antialiased;
+
+  /* ФОН СТРАНИЦЫ. Цвет остаётся тот, что задала тема, а поверх ложатся
+     три слоя: жар под крышей, тёплая подсветка в правом нижнем углу и
+     зерно пергамента. Первые два прибиты к окну
+     (background-attachment: fixed) — при прокрутке свет не уезжает. */
+  background-image:
+    radial-gradient(1200px 520px at 50% -240px, rgba(255, 158, 74, .16), transparent 70%),
+    radial-gradient(900px 460px at 100% 100%, rgba(160, 29, 21, .07), transparent 70%),
+    var(--tavern-noise);
+  background-attachment: fixed, fixed, scroll;
+  background-repeat: no-repeat, no-repeat, repeat;
+  background-position: 50% 0, 100% 100%, 0 0;
+}
+
+/* Выделение текста — охрой по пергаменту, а не стандартной синевой. */
+::selection {
+  background: var(--tavern-gold-soft);
+  color: var(--tavern-text);
+}
+
+/* ЗАГОЛОВКИ — антиква. Тело страницы остаётся системным шрифтом:
+   длинный список ингредиентов гротеском читается быстрее. */
+h1, h2, h3,
+.logo,
+.section-title,
+.page-title,
+.recipe-title,
+.card-title,
+.form-title,
+.reviews-title,
+.legend-title,
+.toc-title,
+.agegate-title {
+  font-family: var(--tavern-display);
+  font-weight: 600;
+  letter-spacing: .01em;
+  line-height: 1.18;
+}
+
+/* ФОКУС С КЛАВИАТУРЫ — один на весь сайт.
+   Перечислено списком, а не `*:focus-visible`, потому что у кнопок свои
+   focus-правила в файлах темы: чтобы их перебить, нужен селектор равной
+   важности, записанный ПОЗЖЕ. */
+.btn:focus-visible,
+.btn-random:focus-visible,
+.btn-ghost:focus-visible,
+.acct-btn:focus-visible,
+.chip:focus-visible,
+.star-btn:focus-visible,
+.back-link:focus-visible,
+.toc-link:focus-visible,
+.footer-link:focus-visible,
+.mine-link:focus-visible,
+.review-del:focus-visible,
+.field-input:focus-visible,
+.notice-close:focus-visible,
+.notice-btn:focus-visible,
+.notice-cookie-link:focus-visible,
+.notice-footer-link:focus-visible,
+.steps-box > summary:focus-visible {
+  outline: 2px solid var(--tavern-gold);
+  outline-offset: 3px;
+}
+
+
+/* ==========================================================================
+   3. ОРНАМЕНТ ЗАГОЛОВКОВ
+   Росчерк под каждым крупным заголовком и ромб перед мелким.
+   Повторяется на всех страницах — именно повторяемость и делает декор
+   системой, а не случайно прилепленной картинкой.
+   ========================================================================== */
+
+.section-title,
+.page-title,
+.recipe-title,
+.reviews-title,
+.form-title,
+.toc-title,
+.legend-title {
+  position: relative;
+}
+
+.section-title::after,
+.page-title::after,
+.recipe-title::after,
+.reviews-title::after,
+.form-title::after,
+.toc-title::after,
+.legend-title::after {
+  content: "";
+  display: block;
+  width: 92px;
+  height: 10px;
+  margin-top: 10px;
+  background: var(--tavern-rule) left center / contain no-repeat;
+  opacity: .85;
+}
+
+/* Мелкие заголовки внутри панелей — только гербовый ромб. */
+.card-title::before,
+.ingredients h2::before,
+.steps h2::before,
+.block-title::before {
+  content: "";
+  display: inline-block;
+  width: 15px;
+  height: 8px;
+  margin-right: 8px;
+  vertical-align: -.05em;
+  background: var(--tavern-diamond) center / contain no-repeat;
+  opacity: .65;
+}
+
+/* «Ингредиенты / Шаги» — узкий разряд, как гравировка в меню. */
+.block-title {
+  letter-spacing: .12em;
+  color: var(--tavern-soft);
+}
+
+
+/* ==========================================================================
+   4. ШАПКА-ГЕРОЙ
+   Дубовая доска, жар под крышей, золото по нижней кромке.
+   ========================================================================== */
+
+.header {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 104px 20px 72px;
+
+  background:
+    radial-gradient(90% 120% at 50% -20%, rgba(255, 150, 70, .26), transparent 62%),
+    radial-gradient(60% 90% at 10% 0%, rgba(160, 29, 21, .38), transparent 66%),
+    radial-gradient(60% 90% at 90% 0%, rgba(90, 20, 12, .5), transparent 66%),
+    linear-gradient(160deg, #2b1410 0%, #4a120c 48%, #1d0b09 100%);
+
+  border-bottom: 1px solid var(--tavern-gold-line);
+  box-shadow: inset 0 -70px 90px -50px rgba(0, 0, 0, .65);
+}
+
+/* Золотая волосинка по нижней кромке шапки. */
+.header::before {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 0;
+  height: 1px;
+  z-index: 2;
+  background: linear-gradient(90deg, transparent, var(--tavern-gold-line), transparent);
+  pointer-events: none;
+}
+
+/* Текст шапки — поверх декоративных слоёв. */
+.header > .logo,
+.header > .tagline,
+.header > .header-inner {
+  position: relative;
+  z-index: 1;
+}
+
+.logo {
+  font-size: clamp(30px, 6vw, 52px);
+  margin: 0 0 10px;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, .45);
+}
+
+.tagline {
+  font-size: clamp(15px, 2.4vw, 19px);
+  opacity: .9;
+  letter-spacing: .02em;
+}
+
+
+/* ==========================================================================
+   5. ДЕКОРАТИВНЫЕ СЛОИ ШАПКИ
+   decor.js вставляет в .header и .section-head такой блок:
+     <span class="tavern-veil" aria-hidden="true">
+       <i class="tavern-crest"></i><i class="tavern-embers"></i>
+       <i class="tavern-smoke"></i>
+     </span>
+   Без скрипта блока просто нет — шапка остаётся красивой, но статичной.
+   ========================================================================== */
+
+.tavern-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Герб-медальон над вывеской. Покачивается на полтора градуса: заметно
+   «на житье», не заметно в глазах. */
+.tavern-crest {
+  position: absolute;
+  top: 26px;
+  left: 50%;
+  width: 66px;
+  height: 66px;
+  margin-left: -33px;
+  background: var(--tavern-crest) center / contain no-repeat;
+  opacity: .8;
+  filter: drop-shadow(0 0 14px rgba(227, 189, 107, .35));
+  animation: tavern-sway 14s ease-in-out infinite alternate;
+}
+
+/* Угли: два слоя редких точек, каждый со своей скоростью и направлением. */
+.tavern-embers {
+  position: absolute;
+  inset: -20% -10%;
+  background-image:
+    radial-gradient(circle, rgba(255, 190, 110, .55) 0 1.1px, transparent 1.7px),
+    radial-gradient(circle, rgba(255, 140, 61, .4) 0 1.6px, transparent 2.4px);
+  background-size: 220px 220px, 360px 360px;
+  opacity: .4;
+  animation: tavern-embers 52s linear infinite;
+}
+
+/* Дым от очага: размытые тёплые пятна у нижнего края шапки. */
+.tavern-smoke {
+  position: absolute;
+  left: -25%;
+  right: -25%;
+  bottom: -40%;
+  height: 130%;
+  background:
+    radial-gradient(38% 52% at 28% 100%, rgba(255, 150, 70, .2), transparent 72%),
+    radial-gradient(34% 48% at 70% 100%, rgba(160, 29, 21, .22), transparent 72%);
+  filter: blur(26px);
+  animation: tavern-smoke 30s ease-in-out infinite alternate;
+}
+
+/* Заголовки разделов строятся слева: медальон там не к месту, герб уже
+   стоит в самой строке заголовка. */
+.section-head .tavern-crest {
+  display: none;
+}
+
+/* Шапка раздела «Мемасики» строит app.js, класса .header у неё нет. */
+.section-head {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding-top: 64px;
+  padding-bottom: 18px;
+}
+
+.section-head > *:not(.tavern-veil) {
+  position: relative;
+  z-index: 1;
+}
+
+
+/* ==========================================================================
+   6. ПАНЕЛИ
+   Общий приём: тёплая тень + тонкая рамка темы. Наведение добавляет
+   золотую нить по верхней кромке карточки.
+   ========================================================================== */
+
+.card,
+.form,
+.reviews,
+.gate,
+.toc,
+.lucky,
+.profile-info,
+.acct,
+.ingredients,
+.steps,
+.ing,
+.review,
+.review-form-box,
+.community-tools,
+.community-links .btn-ghost,
+.legend-stats,
+.legend-ing,
+.legend-step,
+.legend-quote,
+.steps-box,
+.agegate-box,
+.pampe-recipe {
+  background: var(--tavern-card);
+  border-color: var(--tavern-line);
+  box-shadow: var(--tavern-shadow-1);
+}
+
+/* «Пампасики»: карточка рецепта живёт классом .recipe, в корне сайта
+   этим же классом помечена вся страница. Поэтому там, где это важно,
+   правило уточняется родителем. */
+.recipes .recipe {
+  background: var(--tavern-card);
+  border-color: var(--tavern-line);
+  box-shadow: var(--tavern-shadow-1);
+}
+
+/* --- КАРТОЧКА --- */
+.card {
+  position: relative;
+  transition: transform var(--tavern-med) var(--tavern-ease),
+              box-shadow var(--tavern-med) var(--tavern-ease),
+              border-color var(--tavern-med) ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--tavern-shadow-2);
+  border-color: var(--tavern-gold-line);
+}
+
+.card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 18%;
+  right: 18%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--tavern-gold-line), transparent);
+  opacity: 0;
+  transition: opacity var(--tavern-med) ease;
+  pointer-events: none;
+}
+
+.card:hover::after {
+  opacity: 1;
+}
+
+/* --- ФОТО-СЛОТ: виньетка и лёгкое приближение кадра при наведении ---
+   object-fit остаётся тот, что задал файл темы, — мы только двигаем
+   и затемняем края. */
+.card-photo,
+.recipe-photo,
+.card-art,
+.legend-photo {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-photo > img,
+.recipe-photo > img,
+.card-art > img,
+.card-art .card-photo,
+.legend-photo > img {
+  transition: transform var(--tavern-slow) var(--tavern-ease);
+}
+
+.card:hover .card-photo > img,
+.card:hover .card-art > img,
+.card:hover .card-art .card-photo {
+  transform: scale(1.04);
+}
+
+.card-photo::after,
+.card-art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 90% at 50% 0%, transparent 38%, rgba(0, 0, 0, .22));
+  pointer-events: none;
+}
+
+/* Эмодзи-заглушка, которая остаётся под отсутствующей картинкой. */
+.card-photo,
+.card-art {
+  text-shadow: 0 4px 16px rgba(0, 0, 0, .35);
+}
+
+/* Оттенки «фото» живут в файле темы (style.css, классы .photo-*) —
+   они часть базовой палитры, а не атмосферы. Дублировать их здесь
+   значило бы иметь два места, где цвета однажды разъедутся. */
+
+/* Короткий золотой штрих над заголовком внутри карточки. */
+.card-body::before {
+  content: "";
+  align-self: flex-start;
+  width: 26px;
+  height: 2px;
+  margin-bottom: 10px;
+  background: linear-gradient(90deg, var(--tavern-gold), transparent);
+}
+
+/* Большое фото страницы рецепта — рамка-паспарту. */
+.recipe-photo {
+  box-shadow: inset 0 0 0 1px var(--tavern-gold-line), var(--tavern-shadow-1);
+}
+
+/* Врезка «Совет» и служебные примечания: тёплый пергамент. */
+.tip,
+.form-note,
+.notice-note {
+  background: linear-gradient(135deg, var(--tavern-gold-soft), transparent 78%);
+  border-left: 3px solid var(--tavern-gold);
+  box-shadow: none;
+}
+
+/* Блок «что готовим наугад» и панелька аккаунта: золотой корешок слева. */
+.lucky,
+.acct {
+  border-left: 3px solid var(--tavern-gold);
+}
+
+/* Оглавление «Пампасиков»: ссылки-плашки. */
+.toc-link {
+  background: var(--tavern-gold-soft);
+  border: 1px solid transparent;
+  transition: background var(--tavern-fast) ease,
+              color var(--tavern-fast) ease,
+              border-color var(--tavern-fast) ease;
+}
+
+.toc-link:hover {
+  background: var(--tavern-gold);
+  border-color: var(--tavern-gold);
+  color: #1a140e;
+}
+
+/* Прыжок по ссылке из оглавления — мягкая золотая подсветка. */
+.recipe:target {
+  border-color: var(--tavern-gold-line);
+  box-shadow: 0 0 0 3px var(--tavern-gold-soft), var(--tavern-shadow-1);
+}
+
+/* Опасная зона кабинета — красная нить, но без кислотного контраста. */
+.profile-danger {
+  border: 1px solid var(--tavern-gold-line);
+  border-left: 3px solid var(--tavern-ember);
+  background: var(--tavern-card);
+}
+
+
+/* ==========================================================================
+   7. КНОПКИ, ЧИПЫ, ССЫЛКИ
+   ========================================================================== */
+
+.btn {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--tavern-radius-btn);
+  font-weight: 600;
+  box-shadow: var(--tavern-shadow-inset), 0 1px 3px rgba(52, 30, 16, .12);
+  transition: background var(--tavern-fast) ease,
+              box-shadow var(--tavern-fast) ease,
+              transform var(--tavern-fast) ease,
+              color var(--tavern-fast) ease,
+              border-color var(--tavern-fast) ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(120, 24, 16, .28), var(--tavern-shadow-inset);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+/* Блик, пробегающий по кнопке при наведении. Один проход, без цикла. */
+.btn::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -40%;
+  width: 35%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .25), transparent);
+  transform: translateX(-120%);
+  transition: transform .8s var(--tavern-ease);
+  pointer-events: none;
+}
+
+.btn:hover::after {
+  transform: translateX(360%);
+}
+
+/* Второстепенная кнопка — пергамент, а не «прозрачный шаблон». */
+.btn-ghost {
+  background: var(--tavern-card);
+  border: 1px solid var(--tavern-gold-line);
+  color: var(--tavern-text);
+}
+
+.btn-ghost:hover {
+  background: var(--tavern-gold);
+  border-color: var(--tavern-gold);
+  color: #1a140e;
+}
+
+/* Опасная кнопка: тот же красный, но глуше — кричать ей не положено. */
+.btn-danger {
+  background: #6f1310;
+}
+
+.btn-danger:hover {
+  background: #55100d;
+  box-shadow: 0 6px 18px rgba(111, 19, 16, .35), var(--tavern-shadow-inset);
+}
+
+/* Кнопка «наугад» — единственная, что дышит светом. Медленно. */
+.btn-random {
+  animation: tavern-breathe 8s ease-in-out infinite;
+}
+
+/* Кнопка в панельке аккаунта. */
+.acct-btn {
+  background: var(--tavern-card);
+  border: 1px solid var(--tavern-line);
+  border-radius: var(--tavern-radius-btn);
+  transition: background var(--tavern-fast) ease,
+              border-color var(--tavern-fast) ease,
+              color var(--tavern-fast) ease;
+}
+
+.acct-btn:hover {
+  border-color: var(--tavern-gold);
+  background: var(--tavern-gold-soft);
+  color: var(--tavern-text);
+}
+
+/* Чипы-фильтры: «только мои», категории, ранги. */
+.chip {
+  border: 1px solid var(--tavern-line);
+  background: var(--tavern-card);
+  color: var(--tavern-soft);
+  transition: background var(--tavern-fast) ease,
+              border-color var(--tavern-fast) ease,
+              color var(--tavern-fast) ease;
+}
+
+.chip:hover {
+  border-color: var(--tavern-gold);
+  color: var(--tavern-text);
+}
+
+.chip-on {
+  background: var(--tavern-gold);
+  border-color: var(--tavern-gold);
+  color: #1a140e;
+  font-weight: 600;
+}
+
+/* Ссылка «назад» — одна и та же плашка во всех трёх темах. */
+.back-link {
+  display: inline-block;
+  padding: 8px 14px;
+  border: 1px solid var(--tavern-line);
+  border-radius: var(--tavern-radius-btn);
+  background: var(--tavern-card);
+  color: var(--tavern-text);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  box-shadow: 0 1px 2px rgba(52, 30, 16, .05);
+  transition: background var(--tavern-fast) ease,
+              border-color var(--tavern-fast) ease,
+              color var(--tavern-fast) ease,
+              transform var(--tavern-fast) ease;
+}
+
+.back-link:hover {
+  background: var(--tavern-gold-soft);
+  border-color: var(--tavern-gold);
+  color: var(--tavern-text);
+  text-decoration: none;
+  transform: translateX(-2px);
+}
+
+/* Текстовые ссылки внутри панелей — золото вместо чистого акцента. */
+.mine-link,
+.footer-link,
+.notice-cookie-link,
+.notice-footer-link {
+  color: var(--tavern-gold);
+  text-decoration: none;
+}
+
+.mine-link:hover,
+.footer-link:hover,
+.notice-cookie-link:hover,
+.notice-footer-link:hover {
+  color: var(--tavern-gold-bright);
+  text-decoration: underline;
+}
+
+/* Кнопка «удалить отзыв» — тихая, но с золотым откликом. */
+.review-del {
+  border: 1px solid var(--tavern-line);
+  background: var(--tavern-card);
+  color: var(--tavern-soft);
+  border-radius: 8px;
+  transition: border-color var(--tavern-fast) ease, color var(--tavern-fast) ease;
+}
+
+.review-del:hover {
+  border-color: var(--tavern-gold);
+  color: var(--tavern-text);
+}
+
+
+/* ==========================================================================
+   8. ФОРМЫ
+   ========================================================================== */
+
+.field-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--tavern-soft);
+}
+
+.field-input {
+  background: var(--tavern-card);
+  border: 1px solid var(--tavern-line);
+  border-radius: 8px;
+  box-shadow: inset 0 1px 3px rgba(52, 30, 16, .04);
+  transition: border-color var(--tavern-fast) ease,
+              box-shadow var(--tavern-fast) ease;
+}
+
+.field-input:focus {
+  border-color: var(--tavern-gold);
+  box-shadow: 0 0 0 3px var(--tavern-gold-soft), inset 0 1px 3px rgba(52, 30, 16, .04);
+}
+
+.field-hint {
+  color: var(--tavern-soft);
+}
+
+.form-msg-error {
+  color: var(--tavern-ember);
+}
+
+/* Поиск в народной базе — такое же поле, как остальные. */
+.community-search {
+  background: var(--tavern-card);
+  border: 1px solid var(--tavern-line);
+  border-radius: 8px;
+}
+
+
+/* ==========================================================================
+   9. МЕТА-СТРОКА И ИКОНКИ
+   ========================================================================== */
+
+/* decor.js разбирает строку «⏱ 40 мин • 👥 12 штук» на отдельные знаки,
+   чтобы каждый показатель выглядел одинаково на всех страницах. */
+.meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  font-size: 13px;
+  letter-spacing: .04em;
+  color: var(--tavern-soft);
+}
+
+.meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Разделитель — тот же гербовый ромб, только совсем маленький. */
+.meta-item + .meta-item::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  margin-right: 8px;
+  background: var(--tavern-diamond) center / contain no-repeat;
+  opacity: .5;
+}
+
+/* ЕДИНЫЙ СТИЛЬ ИКОНОК.
+   Весь набор рисуется одним пером: сетка 24×24, тон 1.6, скруглённые
+   окончания, цвет currentColor. Поэтому меч, щит и кружка выглядят
+   родственниками, а не гостями из разных наборов. */
+.ico {
+  width: 1.15em;
+  height: 1.15em;
+  flex: none;
+  vertical-align: -.22em;
+  color: var(--tavern-gold);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.meta-item .ico {
+  width: 1em;
+  height: 1em;
+  vertical-align: 0;
+}
+
+.btn .ico,
+.back-link .ico,
+.acct-btn .ico {
+  width: 1.25em;
+  height: 1.25em;
+  margin-right: .35em;
+}
+
+/* Герб в логотипе — крупнее и с тёплым свечением. */
+.logo .ico {
+  width: 1.05em;
+  height: 1.05em;
+  margin-right: .25em;
+  color: var(--tavern-gold-bright);
+  filter: drop-shadow(0 0 10px rgba(227, 189, 107, .35));
+}
+
+
+/* ==========================================================================
+   10. ПАНЕЛЬКА АККАУНТА
+   ========================================================================== */
+
+.acct {
+  position: relative;
+}
+
+/* Полупрозрачный герб в правом краю — знак «своего стола». */
+.acct::after {
+  content: "";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  width: 34px;
+  height: 34px;
+  transform: translateY(-50%);
+  background: var(--tavern-crest) center / contain no-repeat;
+  opacity: .12;
+  pointer-events: none;
+}
+
+.profile-row,
+.mine-row {
+  border-bottom-color: var(--tavern-line);
+}
+
+.reviews-summary {
+  border-bottom: 1px solid var(--tavern-line);
+}
+
+
+/* ==========================================================================
+   11. ОТЗЫВЫ И ЗВЁЗДЫ
+   ========================================================================== */
+
+/* Звёзды — золото с мягким свечением. Цвет берётся из токена темы
+   (--gold), здесь только text-shadow. */
+.stars,
+.star-on {
+  text-shadow: 0 0 10px rgba(184, 134, 47, .35);
+}
+
+.star-btn {
+  color: var(--tavern-line);
+  transition: color var(--tavern-fast) ease, transform var(--tavern-fast) ease;
+}
+
+.star-btn:hover {
+  transform: scale(1.12);
+}
+
+.review-form-box {
+  background: linear-gradient(135deg, var(--tavern-gold-soft), transparent 80%);
+  border: 1px solid var(--tavern-line);
+}
+
+
+/* ==========================================================================
+   12. ПОДВАЛ
+   ========================================================================== */
+
+.footer {
+  position: relative;
+  background: linear-gradient(180deg, #1a0d0c, #100807);
+  border-top: 1px solid var(--tavern-gold-line);
+  box-shadow: inset 0 90px 70px -60px rgba(0, 0, 0, .55);
+}
+
+/* Герб по центру: сайт начинается и заканчивается одним и тем же щитом. */
+.footer::before {
+  content: "";
+  display: block;
+  width: 38px;
+  height: 38px;
+  margin: 0 auto 12px;
+  background: var(--tavern-crest) center / contain no-repeat;
+  opacity: .22;
+}
+
+
+/* ==========================================================================
+   13. ОКНО РЕГЛАМЕНТА И ПЛАШКА ПРО ХРАНИЛИЩЕ
+   ========================================================================== */
+
+.notice-modal {
+  border: 1px solid var(--tavern-gold-line);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .45);
+}
+
+.notice-head {
+  background:
+    radial-gradient(80% 130% at 50% 0%, rgba(255, 150, 70, .28), transparent 62%),
+    linear-gradient(160deg, #2b1410, #4a120c);
+  border-bottom: 1px solid var(--tavern-gold-line);
+}
+
+/* Герб в заголовке окна. */
+.notice-head h2::before {
+  content: "";
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  margin-right: 10px;
+  vertical-align: -.18em;
+  background: var(--tavern-crest) center / contain no-repeat;
+}
+
+.notice-foot {
+  background: linear-gradient(135deg, #f8f0e6, #efe4d5);
+  border-top: 1px solid var(--tavern-line);
+}
+
+.notice-btn {
+  border-radius: var(--tavern-radius-btn);
+  font-weight: 600;
+  transition: background var(--tavern-fast) ease,
+              border-color var(--tavern-fast) ease,
+              color var(--tavern-fast) ease;
+}
+
+.notice-btn-primary {
+  background: var(--tavern-ember);
+  box-shadow: var(--tavern-shadow-inset);
+}
+
+.notice-btn-primary:hover {
+  background: #6f1310;
+}
+
+.notice-btn-ghost {
+  background: transparent;
+  border: 1px solid var(--tavern-line);
+  color: var(--tavern-soft);
+}
+
+.notice-btn-ghost:hover {
+  border-color: var(--tavern-gold);
+  color: var(--tavern-text);
+}
+
+.notice-cookie {
+  border: 1px solid var(--tavern-line);
+  border-left: 3px solid var(--tavern-gold);
+}
+
+
+/* ==========================================================================
+   14. РАЗДЕЛ «МЕМАСИКИ»: та же система, но ночь и золото
+   ========================================================================== */
+
+/* Тёмная тема переопределяет только атмосферные токены: цвета берутся
+   из её собственных переменных (--accent — золото Аегиса, --card —
+   тёмный дуб). Правила ниже при этом остаются общими. */
+body.tavern-dark {
+  --tavern-gold: var(--accent, #c9a227);
+  --tavern-gold-bright: #e3bd6b;
+  --tavern-gold-line: rgba(201, 162, 39, .32);
+  --tavern-gold-soft: rgba(201, 162, 39, .12);
+  --tavern-ember: #b8442f;
+  --tavern-card: var(--card, #14110f);
+  --tavern-line: #352c27;
+  --tavern-soft: #a2968a;
+  --tavern-text: #ece8e1;
+
+  --tavern-shadow-1: 0 1px 2px rgba(0, 0, 0, .3), 0 10px 24px rgba(0, 0, 0, .22);
+  --tavern-shadow-2: 0 2px 6px rgba(0, 0, 0, .4), 0 18px 42px rgba(0, 0, 0, .34);
+  --tavern-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, .04);
+
+  background-image:
+    radial-gradient(1200px 520px at 50% -240px, rgba(255, 158, 74, .1), transparent 70%),
+    radial-gradient(900px 460px at 100% 100%, rgba(201, 162, 39, .07), transparent 70%),
+    var(--tavern-noise);
+}
+
+/* Карточки ночи: то же движение, что в светлой теме, плюс золотое
+   свечение вместо тёплой тени. */
+body.tavern-dark .card:hover {
+  border-color: var(--tavern-gold-line);
+  box-shadow: var(--tavern-shadow-2), 0 0 26px rgba(201, 162, 39, .14);
+}
+
+/* Свечение бейджа легенды замедлено: на 2.4 с оно пульсировало быстрее,
+   чем читается карточка. */
+body.tavern-dark .card-badge-legend {
+  animation: tavern-glow 5.5s ease-in-out infinite;
+}
+
+body.tavern-dark .card-legend,
+body.tavern-dark .card-legend:hover {
+  border-color: rgba(201, 162, 39, .4);
+  box-shadow: 0 0 24px rgba(201, 162, 39, .18);
+  transform: translateY(-4px);
+}
+
+/* Полоса фильтров — единая панель с остальными. */
+body.tavern-dark .filters {
+  border-top: 1px solid var(--tavern-gold-line);
+  border-bottom: 1px solid var(--tavern-gold-line);
+  border-radius: var(--tavern-radius);
+}
+
+/* Кнопки раздела — тот же радиус, что на всём сайте. */
+body.tavern-dark .btn {
+  border-radius: var(--tavern-radius-btn);
+}
+
+body.tavern-dark .btn:hover {
+  box-shadow: 0 6px 18px rgba(201, 162, 39, .25), var(--tavern-shadow-inset);
+}
+
+/* Цитаты — золото по левому краю, как «Совет» в светлой теме. */
+body.tavern-dark .card-quote,
+body.tavern-dark .legend-quote {
+  border-left: 3px solid var(--tavern-gold);
+  background: linear-gradient(135deg, var(--tavern-gold-soft), transparent 78%);
+}
+
+/* Окно возраста. */
+body.tavern-dark .agegate {
+  background: rgba(10, 7, 6, .82);
+}
+
+body.tavern-dark .agegate-box {
+  border: 1px solid var(--tavern-gold-line);
+}
+
+/* Шаг-цифры легенды и теги — один золотой тон. */
+body.tavern-dark .legend-step-num {
+  background: var(--tavern-gold-soft);
+  border-color: var(--tavern-gold);
+  color: var(--tavern-gold);
+}
+
+body.tavern-dark .tag,
+body.tavern-dark .legend-tag,
+body.tavern-dark .card-badge {
+  border-color: var(--tavern-line);
+  color: var(--tavern-soft);
+}
+
+@keyframes tavern-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 1px rgba(201, 162, 39, .45), 0 0 14px rgba(227, 189, 107, .2);
+  }
+  50% {
+    box-shadow: 0 0 0 1px rgba(201, 162, 39, .85), 0 0 30px rgba(227, 189, 107, .42);
+  }
+}
+
+
+/* ==========================================================================
+   15. ПОЯВЛЕНИЕ ПРИ ПРОКРУТКЕ
+   ==========================================================================
+   Класс html.tavern-js навешивает decor.js. Нет скрипта — нет и класса,
+   то есть контент виден всегда: анимация украшает, а не прячет.
+
+   Сдвиг идёт свойством translate, а не transform: у карточек transform
+   занят подъёмом при наведении, и два приёма не дерутся за одно место. */
+
+html.tavern-js .tavern-reveal {
+  opacity: 0;
+  translate: 0 18px;
+  transition:
+    opacity var(--tavern-slow) var(--tavern-ease) var(--tavern-delay, 0s),
+    translate var(--tavern-slow) var(--tavern-ease) var(--tavern-delay, 0s),
+    transform var(--tavern-med) var(--tavern-ease) 0s,
+    box-shadow var(--tavern-med) var(--tavern-ease) 0s,
+    border-color var(--tavern-med) ease 0s;
+}
+
+html.tavern-js .tavern-reveal.tavern-in {
+  opacity: 1;
+  translate: 0 0;
+}
+
+
+/* ==========================================================================
+   16. КЛЮЧЕВЫЕ КАДРЫ
+   ========================================================================== */
+
+/* Покачивание герба: полтора градуса туда-сюда за 14 секунд. */
+@keyframes tavern-sway {
+  from { transform: rotate(-1.2deg) translateY(0); }
+  to   { transform: rotate(1.2deg) translateY(-3px); }
+}
+
+/* Угли: два слоя точек расходятся в разные стороны. */
+@keyframes tavern-embers {
+  from { background-position: 0 0, 0 0; }
+  to   { background-position: 110px -220px, -180px -360px; }
+}
+
+/* Дым: медленный дрейф и почти незаметное дыхание по прозрачности. */
+@keyframes tavern-smoke {
+  from { transform: translate3d(-2%, 1%, 0) scale(1); opacity: .7; }
+  to   { transform: translate3d(3%, -2%, 0) scale(1.06); opacity: 1; }
+}
+
+/* Свечение кнопки «наугад»: 8 секунд на цикл. */
+@keyframes tavern-breathe {
+  0%, 100% { box-shadow: var(--tavern-shadow-inset), 0 1px 3px rgba(52, 30, 16, .12); }
+  50%      { box-shadow: var(--tavern-shadow-inset), 0 0 22px rgba(227, 189, 107, .3); }
+}
+
+
+/* ==========================================================================
+   17. АДАПТАЦИЯ
+   ========================================================================== */
+
+@media (max-width: 760px) {
+  .header {
+    padding: 84px 16px 52px;
+  }
+
+  .tavern-crest {
+    width: 52px;
+    height: 52px;
+    margin-left: -26px;
+    top: 20px;
+  }
+
+  .section-head {
+    padding-top: 52px;
+  }
+
+  /* На телефоне золотая нить теряется на сгибе — проще убрать. */
+  .card::after {
+    display: none;
+  }
+}
+
+
+/* ==========================================================================
+   18. «УБРАТЬ АНИМАЦИИ» В СИСТЕМЕ
+   Человек, которому от движения мутит, должен получить тот же сайт,
+   но неподвижный: всё видно сразу, герб не качается, дым не плывёт.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .tavern-crest,
+  .tavern-embers,
+  .tavern-smoke,
+  .btn-random,
+  .card-badge-legend {
+    animation: none !important;
+  }
+
+  .btn::after {
+    display: none;
+  }
+
+  .card:hover,
+  .btn:hover,
+  .back-link:hover,
+  .card:hover .card-photo > img,
+  .card:hover .card-art > img {
+    transform: none;
+  }
+
+  /* Всё, что должно было появляться при прокрутке, видно сразу. */
+  html.tavern-js .tavern-reveal {
+    opacity: 1 !important;
+    translate: none !important;
+    transition: none !important;
+  }
+
+  /* Стены зала (раздел 19) заодно: огонь не должен мигать, если
+      человеку от движения плохо. */
+  .tavern-hall i,
+  .tavern-hall i::before,
+  .tavern-hall i::after,
+  .tavern-veil .tavern-web {
+    animation: none !important;
+  }
+}
+
+
+/* ==========================================================================
+   19. СТЕНЫ ЗАЛА: ФАКЕЛЫ, ЦЕПИ, ПАУТИНА
+   ==========================================================================
+   Всё, что висит не на вывеске, а на самих стенах. decor.js вставляет в
+   <body> один неподвижный слой:
+
+     <div class="tavern-hall" aria-hidden="true">
+       <i class="hall-torch hall-torch-left"></i>
+       <i class="hall-torch hall-torch-right"></i>
+       <i class="hall-chain hall-chain-left"></i>
+       <i class="hall-chain hall-chain-right"></i>
+       <i class="hall-web hall-web-left"></i>
+       <i class="hall-web hall-web-right"></i>
+     </div>
+
+   Слой уходит ПОД контент (z-index: -1): пламя видно в полях по краям
+   окна и в промежутках между карточками, но ни одна надпись не читается
+   «сквозь огонь». Без decor.js блока просто нет — стены остаются
+   крашеными фоном тела, то есть сайт выглядит как раньше.
+
+   Приём один для всех трёх тем (светлой, «Пампасиков», тёмной
+   «Мемасиков»): цвета взяты тёплые и полупрозрачные, поэтому на
+   пергаменте они читаются как копоть и свет, а на дубе — как настоящее
+   пламя в темноте. */
+
+:root {
+  /* САМА СТЕНА. Камень, на который вешают факелы. Цвет задаёт именно
+     слой, а не тема: тема отвечает за карточки и текст, а стена — за
+     «что видно, когда контент кончился». */
+  --hall-wall: #e6d8bd;
+
+  /* Доски пола у нижнего края окна и балка потолка у верхнего. */
+  --hall-floor-1: rgba(122, 88, 46, .42);
+  --hall-floor-2: rgba(74, 50, 24, .62);
+  --hall-beam: rgba(96, 66, 32, .30);
+
+  /* ОТТЕНКИ СТЕНЫ. Свет, копоть и сумерки — тоже переменные, а не
+     цвета внутри background: тогда тёмной теме не нужно переписывать
+     всю многослойную стену заново, она меняет только эти шесть
+     значений. Один список слоёв — одна возможность ошибиться. */
+  --hall-soot: rgba(28, 16, 6, .26);      /* копоть под потолком */
+  --hall-glow: rgba(255, 190, 104, .30);  /* тёплые пятна от факелов */
+  --hall-pool: rgba(255, 242, 214, .36);  /* световое пятно в середине */
+  --hall-vignette: rgba(22, 12, 4, .34);  /* виньетка по краям окна */
+  --hall-dusk: rgba(0, 0, 0, .20);        /* сумерки у пола */
+
+  /* КЛАДКА. Плитка 120×60: два ряда со сдвигом на полкирпича
+     («баварская» кладка), а не сетка. Плитка повторяется по обеим
+     осям, поэтому стена бесконечная: на любом размере окна швы не
+     рвутся и не сходятся в углах.
+
+     ДВА рисунка, как с паутиной ниже: швы обязаны быть ТЕМНЕЕ камня,
+     на котором лежат. В светлой теме швы коричневые, в тёмной —
+     чёрные; кремовые швы по дубу выглядели бы как плесень.
+     SVG в data-URI не умеет currentColor, поэтому вариант выбирается
+     переменной, а не наследованием цвета. */
+  --hall-bricks: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='60'%3E%3Cg fill='none' stroke='%239a7b4f' stroke-opacity='.40' stroke-width='1.4'%3E%3Cpath d='M0 .7h120M0 30.7h120'/%3E%3Cpath d='M0 .7v29.3M60 .7v29.3M30 30.7V60M90 30.7V60'/%3E%3C/g%3E%3C/svg%3E");
+
+  --hall-bricks-on-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='60'%3E%3Cg fill='none' stroke='%23000000' stroke-opacity='.42' stroke-width='1.4'%3E%3Cpath d='M0 .7h120M0 30.7h120'/%3E%3Cpath d='M0 .7v29.3M60 .7v29.3M30 30.7V60M90 30.7V60'/%3E%3C/g%3E%3C/svg%3E");
+
+  /* Паутина: угол-«четверть» с нитями из вершины и провисающими
+     дугами. Нити тонкие (1.1) и полупрозрачные — на экране это
+     примерно 15% заметности, ровно столько, сколько нужно.
+
+     ДВА рисунка, а не один, потому что нити обязаны быть ТЕМНЕЕ фона,
+     на котором висят:
+       · --hall-web          — тёплые коричневые нити, они для светлых
+         тем (пергамент главной и страниц рецептов, фон «Пампасиков»);
+       · --hall-web-on-dark  — кремовые нити для тёмного: шапка всех тем
+         (она тёмно-вишнёвая) и тёмная тема «Мемасиков».
+     Светлые нити на пергаменте просто исчезли бы — кремовое на кремовом.
+     SVG в data-URI не умеет currentColor, поэтому вариант выбирается
+     переменной, а не наследованием цвета. */
+  --hall-web: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 140'%3E%3Cg fill='none' stroke='%236f5630' stroke-opacity='.75' stroke-width='1.2'%3E%3Cpath d='M0 0 140 0M0 0 118 76M0 0 76 118M0 0 0 140'/%3E%3Cpath d='M28 4Q9 9 4 28M58 9Q25 25 9 58M92 14Q40 40 14 92M126 20Q54 54 20 126'/%3E%3C/g%3E%3C/svg%3E");
+
+  --hall-web-on-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 140'%3E%3Cg fill='none' stroke='%23f0e4c4' stroke-opacity='.7' stroke-width='1.2'%3E%3Cpath d='M0 0 140 0M0 0 118 76M0 0 76 118M0 0 0 140'/%3E%3Cpath d='M28 4Q9 9 4 28M58 9Q25 25 9 58M92 14Q40 40 14 92M126 20Q54 54 20 126'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+.tavern-hall {
+  position: fixed;
+  inset: 0;
+  z-index: -1;              /* под всем содержимым страницы */
+  overflow: hidden;         /* обрезает то, что вылезло за окно */
+  pointer-events: none;     /* decor-стены нельзя ни нажать, ни выделить */
+
+  /* САМА СТЕНА. Камень рисует этот слой, а не body: нет блока
+     .tavern-hall (без decor.js) — нет и стены, страница выглядит ровно
+     как до декора. Фон тела при этом остаётся «бумагой» сайта.
+
+     Слои, верхний первый:
+       1. балка под потолком;
+       2. копоть по верху стены;
+       3–4. свет двух факелов — тёплые пятна на уровне огня;
+       5. световое пятно в середине — оно держит текст читаемым;
+       6. виньетка по краям окна;
+       7. сумерки у пола, 8. доски пола, 9. тень под ними;
+       10. кладка, 11. сам камень.
+     Всё, кроме камня, полупрозрачное: стена читается стеной, но
+     надписи поверх неё не теряются. */
+   background:
+     linear-gradient(180deg, var(--hall-beam), rgba(0, 0, 0, 0) 92px)
+       top / 100% 92px no-repeat,
+     linear-gradient(180deg, var(--hall-soot), transparent 32%),
+     radial-gradient(30% 24% at 4% 29%, var(--hall-glow), transparent 72%),
+     radial-gradient(30% 24% at 96% 29%, var(--hall-glow), transparent 72%),
+     radial-gradient(76% 60% at 50% 46%, var(--hall-pool), transparent 74%),
+     radial-gradient(126% 110% at 50% 46%, rgba(0, 0, 0, 0) 56%, var(--hall-vignette)),
+     linear-gradient(180deg, rgba(0, 0, 0, 0) 58%, var(--hall-dusk)),
+     repeating-linear-gradient(90deg, var(--hall-floor-1) 0 2px, rgba(0, 0, 0, 0) 2px 96px)
+       bottom / 100% 150px no-repeat,
+     linear-gradient(180deg, rgba(0, 0, 0, 0), var(--hall-floor-2))
+       bottom / 100% 150px no-repeat,
+     var(--hall-bricks),
+     var(--hall-wall);
+}
+
+/* ТЁМНАЯ ТЕМА «Мемасиков»: тот же дуб, но без лампочки.
+   Слои стены переписывать не нужно — для этого оттенки и вынесены
+   в переменные. Тема меняет шесть значений: дуб становится тёмным,
+   швы — чёрными (кремовые швы по тёмному дереву выглядят как плесень,
+   а не как свет в щелях), а пятна света — сильнее, потому что в
+   тёмном зале факел и должен быть самым заметным предметом. */
+body.tavern-dark .tavern-hall {
+  --hall-wall: #241a12;
+  --hall-bricks: var(--hall-bricks-on-dark);
+  --hall-floor-1: rgba(0, 0, 0, .5);
+  --hall-floor-2: rgba(0, 0, 0, .74);
+  --hall-beam: rgba(0, 0, 0, .46);
+  --hall-soot: rgba(0, 0, 0, .46);
+  --hall-glow: rgba(255, 170, 74, .34);
+  --hall-pool: rgba(255, 214, 140, .12);
+  --hall-vignette: rgba(0, 0, 0, .52);
+  --hall-dusk: rgba(0, 0, 0, .30);
+}
+
+
+/* Страховка порядка слоёв. Сейчас фон body уходит на «холст» окна
+   (правило из §2), и z-index: -1 ложится поверх него сам. Но стоит
+   какой-нибудь теме однажды написать `html { background: ... }` — и
+   фон начнёт рисовать само тело, а стены спрячутся под него.
+   isolation создаёт у тела отдельный слой: «-1» внутри него значит
+   «поверх фона тела, под содержимым» при любом раскладе. */
+body {
+  isolation: isolate;
+}
+
+.tavern-hall i {
+  position: absolute;
+  display: block;
+}
+
+
+/* --- ФАКЕЛЫ ------------------------------------------------------------- */
+
+/* Само пятно света: широкий тёплый ореол, у которого «дышит» яркость.
+   Длительность у левого и правого разная и сдвинута по фазе — иначе
+   два огня мигают синхронно, и это сразу видно как подделку. */
+.hall-torch {
+  top: 24%;
+  width: 260px;
+  height: 300px;
+  background: radial-gradient(closest-side circle at 50% 22%,
+    rgba(255, 176, 84, .30), rgba(255, 140, 61, .12) 46%, transparent 72%);
+  animation: hall-glow 4.6s ease-in-out infinite;
+}
+
+.hall-torch-left {
+  left: -34px;
+}
+
+.hall-torch-right {
+  right: -34px;
+  animation-delay: -2.3s;
+}
+
+/* Кронштейн: кованая чаша, к которой прибит факел. */
+.hall-torch::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 24%;
+  width: 26px;
+  height: 62px;
+  margin-left: -13px;
+  background: linear-gradient(180deg, #4a3320, #241809 62%);
+  border-radius: 4px 4px 12px 12px;
+  box-shadow: inset 0 2px 0 rgba(227, 189, 107, .35),
+              0 10px 22px rgba(0, 0, 0, .45);
+}
+
+/* Пламя — капля на верхушке чаши. Живёт своей, более быстрой жизнью,
+   чем ореол: дёрнулась свеча — дёрнулось и пятно света на стене. */
+.hall-torch::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 11%;
+  width: 22px;
+  height: 42px;
+  margin-left: -11px;
+  border-radius: 50% 50% 42% 42% / 76% 76% 26% 26%;
+  background: radial-gradient(62% 60% at 50% 74%,
+    #fff3c4, #ffb347 46%, rgba(201, 72, 20, .78) 80%, transparent);
+  box-shadow: 0 0 26px rgba(255, 168, 66, .75),
+              0 0 62px rgba(255, 122, 40, .40);
+  transform-origin: 50% 100%;
+  animation: hall-flame 2.7s ease-in-out infinite;
+}
+
+.hall-torch-right::after {
+  animation-delay: -1.15s;
+}
+
+
+/* --- ЦЕПИ ---------------------------------------------------------------- */
+
+/* Звенья нарисованы полосатой растяжкой: светлое ушко — тёмное ушко.
+   Цепь висит с потолка и раскачивается вокруг верхнего края, как и
+   должна: нижний конец ходит сильнее верхнего. */
+.hall-chain {
+  top: -8px;
+  width: 6px;
+  height: 190px;
+  border-radius: 3px;
+  opacity: .5;
+  transform-origin: 50% 0;
+  background: repeating-linear-gradient(180deg,
+    rgba(227, 189, 107, .6) 0 2px,
+    rgba(96, 70, 38, .6) 2px 10px,
+    rgba(227, 189, 107, .6) 10px 12px,
+    transparent 12px 15px);
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .35));
+  animation: hall-sway 7.6s ease-in-out infinite alternate;
+}
+
+.hall-chain-left {
+  left: 46px;
+}
+
+.hall-chain-right {
+  right: 46px;
+  animation-delay: -3.4s;
+}
+
+/* Кольцо на конце: без него цепь обрывается «в никуда» и читается
+   как полоска, а не как кованое изделие. */
+.hall-chain::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -14px;
+  width: 16px;
+  height: 16px;
+  margin-left: -8px;
+  border: 2px solid rgba(227, 189, 107, .5);
+  border-radius: 50%;
+}
+
+
+/* --- ПАУТИНА В НИЖНИХ УГЛАХ ---------------------------------------------- */
+
+/* Рисунок выведен из угла-«четверти», у которого вершина — левый
+   верхний угол. Переворот по оси ставит вершину куда нужно: левая
+   паутина цепляется за нижний левый угол окна, правая — за нижний
+   правый. */
+.hall-web {
+  bottom: -2px;
+  width: 150px;
+  height: 150px;
+  background: var(--hall-web) center / contain no-repeat;
+  opacity: .3;
+}
+
+.hall-web-left {
+  left: -2px;
+  transform: scaleY(-1);
+}
+
+.hall-web-right {
+  right: -2px;
+  transform: scale(-1);
+}
+
+/* Тёмная тема «Мемасиков»: стены чёрные, и коричневые нити на них
+   тонут. Здесь паутина плетётся кремовой нитью — тем же рисунком,
+   что и в шапке. */
+body.tavern-dark .hall-web {
+  background-image: var(--hall-web-on-dark);
+}
+
+
+/* --- ПАУТИНА В УГЛАХ ШАПКИ ------------------------------------------------ */
+
+/* Верхние углы «приплетены» паутиной уже внутри вуали шапки: там фон
+   тёмный и дерево, и нити читаются лучше всего. decor.js добавляет эти
+   два элемента в тот же блок, что и герб с углями. */
+.tavern-veil .tavern-web {
+  position: absolute;
+  top: -2px;
+  width: 118px;
+  height: 118px;
+  background: var(--hall-web-on-dark) center / contain no-repeat;
+  opacity: .26;
+  animation: hall-web-breath 9s ease-in-out infinite alternate;
+}
+
+.tavern-veil .tavern-web-left {
+  left: -2px;
+}
+
+.tavern-veil .tavern-web-right {
+  right: -2px;
+  transform: scaleX(-1);
+  animation-delay: -4.5s;
+}
+
+
+/* --- Ключевые кадры ------------------------------------------------------- */
+
+/* Пятно света: дышит яркостью и размером, но не прыгает. */
+@keyframes hall-glow {
+  0%, 100% { opacity: .78; transform: scale(1); }
+  38%      { opacity: 1;   transform: scale(1.03); }
+  62%      { opacity: .86; transform: scale(.99); }
+}
+
+/* Пламя: лёгкое покачивание + изменение высоты. Угол поворота
+   меньше двух градусов — заметно как «живое», а не как дёрганое. */
+@keyframes hall-flame {
+  0%, 100% { transform: scale(1) rotate(-1deg); }
+  22%      { transform: scale(1.06, .96) rotate(1.4deg); }
+  47%      { transform: scale(.95, 1.05) rotate(-1.6deg); }
+  73%      { transform: scale(1.03, .98) rotate(.8deg); }
+}
+
+/* Раскачивание цепи: амплитуда 2.2 градуса, период 7.6 с. */
+@keyframes hall-sway {
+  from { transform: rotate(-2.2deg); }
+  to   { transform: rotate(2.2deg); }
+}
+
+/* Паутина едва заметно «дышит» прозрачностью — приём тот же, что у
+   дыма шапки: движение есть, но глаз за него не цепляется. */
+@keyframes hall-web-breath {
+  from { opacity: .2; }
+  to   { opacity: .32; }
+}
+
+
+/* --- Адаптация ------------------------------------------------------------ */
+
+/* На узком экране контент почти не оставляет полей по краям: факелы
+   и цепи ушли бы под карточки и начали бы спорить с текстом. Стены
+   остаются паутиной — она в углах и никого не трогает. */
+@media (max-width: 1180px) {
+  .hall-torch,
+  .hall-chain {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .hall-web {
+    width: 104px;
+    height: 104px;
+    opacity: .24;
+  }
+
+  .tavern-veil .tavern-web {
+    width: 84px;
+    height: 84px;
+  }
+}
+
+/* Тёмная тема: здесь стены и есть тёмное дерево, поэтому огонь можно
+   сделать ярче — на пергаменте он был бы грязным пятном, на дубе это
+   настоящий свет в тёмном зале. */
+body.tavern-dark .hall-torch {
+  background: radial-gradient(closest-side circle at 50% 22%,
+    rgba(255, 190, 96, .40), rgba(255, 140, 61, .16) 46%, transparent 74%);
+}
+
+body.tavern-dark .hall-chain {
+  opacity: .62;
+}
+
+body.tavern-dark .hall-web {
+  opacity: .38;
+}
+
+/* Печать: вся движущаяся мишура не нужна ни на какой бумаге. */
+@media print {
+  .tavern-hall,
+  .tavern-veil .tavern-web {
+    display: none;
+  }
+}

@@ -27,6 +27,11 @@
        потому что эти же правила нужны страницам «Пампасиков» и
        «Мемасиков», где style.css не подключён. -->
   <link rel="stylesheet" href="notice.css">
+
+  <!-- АТМОСФЕРА ТАВЕРНЫ. Подключаем ПОСЛЕ notice.css, чтобы его
+       декоративные правила (орнамент заголовков, золотая нить,
+       медальон шапки) легли поверх базовых стилей. -->
+  <link rel="stylesheet" href="tavern.css">
 </head>
 
 <body>
@@ -142,8 +147,9 @@
       </article>
 
       <!-- ===== КАРТОЧКА РЕЦЕПТА №4 =====
-           Карбонара: файл img/carbonara.jpg. Пока его нет — виден
-           эмодзи 🍝 на оранжевом градиенте. -->
+           Карбонара: файл img/carbonara.jpg лежит в img/. Если его
+           убрать, ui.js уберёт тег img, и наружу выйдет эмодзи 🍝
+           на оранжевом градиенте — правки в разметке не нужны. -->
       <article class="card">
         <div class="card-photo photo-orange">🍝
           <img src="img/carbonara.jpg"
@@ -189,7 +195,7 @@
 
          <div class="card-body">
            <h3 class="card-title">Раздел «Мемасики»</h3>
-           <p class="card-meta">🥤 16 рецептов &nbsp;•&nbsp; 🍲 5 категорий &nbsp;•&nbsp; 🎮 Herald → Immortal</p>
+           <p class="card-meta">🥤 18 рецептов &nbsp;•&nbsp; 🍲 5 категорий &nbsp;•&nbsp; 🎮 Herald → Immortal</p>
            <p class="card-text">Мемные рецепты для пати: фильтры по MMR и категориям, тёмная тема и коктейль «Коч братан Кирилл» под замком 18+.</p>
            <a class="btn" href="memasiki/index.html">Открыть раздел →</a>
          </div>
@@ -232,6 +238,14 @@
       а в разделах его нет — тогда notice.js берёт своё
       чтение localStorage (в нём есть своя страховка) -->
   <script src="notice.js" defer></script>
+
+  <!-- ДЕКОР ТАВЕРНЫ (геральдика, иконки, проявление карточек).
+       Ставится ПОСЛЕ notice.js и всех рабочих скриптов: decor.js
+       подменяет emoji на SVG-иконки и проявляет готовые блоки,
+       поэтому обязан запускаться, когда они уже нарисованы.
+       Без decor.js сайт работает как раньше: класс html.tavern-js
+       не появляется, tavern.css не прячет и не перекрашивает. -->
+  <script src="decor.js" defer></script>
 
 </body>
 </html>
